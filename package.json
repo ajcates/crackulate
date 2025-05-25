@@ -1,0 +1,11 @@
+{
+  "name": "crackulate",
+  "version": "1.0.0",
+  "description": "a mobile crackulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "live-server &"
+  },
+  "author": "",
+  "license": "ISC"
+}
