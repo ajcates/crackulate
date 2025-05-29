@@ -15,6 +15,7 @@
       <li>
         <button id="open">📂 Open</button>
         <button id="save">💾 SaveAs</button>
+          <button id="new">📄 New</button>
         <button id="lineref">#️⃣ LineRef</button>
         <button id="undo">↩️ Undo</button>
       </li>
@@ -237,6 +238,16 @@
     const resultsDiv = document.querySelector('.results'); // Div to display results
     let scope = {}; // Global scope to persist variable values
     let undoStack = []; // Stack to store editor states for undo
+    let currentFileName = null; // Variable to store the current file name for "Save" vs "Save As"
+
+    function clearPage() {
+      editor.value = '';
+      resultsDiv.innerHTML = ''; // Clear results
+      undoStack = ['']; // Reset undo stack with an empty state
+      updateResults(); // Update display (should show '-' for results)
+      localStorage.removeItem('calcedit_content'); // Clear autosaved content
+      currentFileName = null; // Reset current file name
+    }
 
     // **Update Results Function**
     // Processes each line of the editor and updates the results display
@@ -313,6 +324,9 @@
     // **Undo Button Event**
     // Reverts to the previous state if available
     const undoButton = document.getElementById('undo');
+    // The 'new' button ID is already added to the HTML in a previous step.
+    const newButton = document.getElementById('new');
+
     undoButton.addEventListener('click', () => {
       if (undoStack.length > 1) {
         undoStack.pop(); // Remove current state
@@ -348,6 +362,7 @@
           undoStack = [content]; // Reset undo stack
           updateResults();
           modal.classList.add('hidden');
+          currentFileName = fileName; // <--- Update currentFileName when a file is opened
         });
         fileList.appendChild(li);
       });
@@ -371,6 +386,57 @@
       const fileName = prompt('Enter file name:');
       if (fileName) {
         localStorage.setItem('calcedit_file_' + fileName, editor.value);
+        currentFileName = fileName; // Keep track of the current file name
+      }
+    });
+
+    newButton.addEventListener('click', () => {
+      const currentContent = editor.value;
+      let isUnsaved = false;
+
+      if (currentContent === '') {
+        isUnsaved = false; // Empty editor is never unsaved
+      } else if (currentFileName) {
+        // If we have a current file name, compare against that file's saved content
+        const savedFileContent = localStorage.getItem('calcedit_file_' + currentFileName);
+        if (savedFileContent === null || currentContent !== savedFileContent) {
+          isUnsaved = true;
+        }
+      } else {
+        // No current file name, compare against auto-saved content
+        const autoSavedContent = localStorage.getItem('calcedit_content');
+        if (autoSavedContent === null || currentContent !== autoSavedContent) {
+          // If nothing is in calcedit_content (e.g. first load, or after clearing localStorage)
+          // and editor has content, it's unsaved.
+          // Or if content differs from autoSavedContent.
+          isUnsaved = true;
+        }
+      }
+
+      if (isUnsaved) {
+        if (confirm("Do you want to save the current changes?")) {
+          let fileNameToSave = currentFileName;
+          if (!fileNameToSave) { // Only prompt if no currentFileName
+            fileNameToSave = prompt('Enter file name:');
+          }
+          
+          if (fileNameToSave) { // User provided a filename or had one, and didn't cancel prompt
+            localStorage.setItem('calcedit_file_' + fileNameToSave, currentContent);
+            if (!currentFileName) { // If it was a new file name from prompt
+                currentFileName = fileNameToSave; // Update currentFileName
+            }
+            clearPage();
+          } else {
+            // User cancelled the save prompt (if it appeared), so do nothing further.
+            return;
+          }
+        } else {
+          // "Don't Save" chosen (or "Cancel" on the confirm dialog)
+          clearPage();
+        }
+      } else {
+        // Content is saved or editor is empty, just clear
+        clearPage();
       }
     });
   </script>
