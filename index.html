@@ -233,12 +233,247 @@
 
 //lexar praer end
 
+class Autocomplete {
+  constructor(textareaElement, suggestionsElement) {
+    this.textarea = textareaElement;
+    this.suggestionsContainer = suggestionsElement;
+    // Ensure variablesScope is a function that returns the current scope object
+    this.variablesScope = () => scope; // Access the global `scope`
+    this.onInput = this.onInput.bind(this);
+    this.hideSuggestions = this.hideSuggestions.bind(this);
+    this.activeSuggestionIndex = -1;
+  }
+
+  getVariables() {
+    return Object.keys(this.variablesScope());
+  }
+
+  extractCurrentWord() {
+    const text = this.textarea.value;
+    const cursorPosition = this.textarea.selectionStart;
+
+    let startIndex = cursorPosition;
+    while (startIndex > 0 && /[a-zA-Z0-9_]/.test(text[startIndex - 1])) {
+      startIndex--;
+    }
+
+    const wordForFiltering = text.substring(startIndex, cursorPosition);
+
+    let actualEndIndex = cursorPosition;
+    while (actualEndIndex < text.length && /[a-zA-Z0-9_]/.test(text[actualEndIndex])) {
+      actualEndIndex++;
+    }
+    
+    if (wordForFiltering.length === 0) {
+      if (cursorPosition === 0) {
+        if (text.length > 0 && !/[a-zA-Z0-9_]/.test(text[cursorPosition])) return null;
+      } else if (!/[a-zA-Z0-9_]/.test(text[cursorPosition - 1])) {
+         if (cursorPosition < text.length && !/[a-zA-Z0-9_]/.test(text[cursorPosition])) {
+             return null;
+         }
+      }
+    }
+
+    if (startIndex < text.length && !/[a-zA-Z0-9_]/.test(text[startIndex])) {
+        if(wordForFiltering.length === 0) return null;
+    }
+    
+    if (wordForFiltering.length === 0 && text.substring(startIndex, actualEndIndex).length === 0) {
+        let validStartContext = false;
+        if (startIndex === 0) validStartContext = true;
+        else if (startIndex > 0 && !/[a-zA-Z0-9_]/.test(text[startIndex-1])) validStartContext = true;
+
+        if (!validStartContext) return null;
+        if (startIndex < text.length && !/[a-zA-Z0-9_]/.test(text[startIndex])) return null;
+        if (startIndex === text.length && !validStartContext && text.length > 0) return null; 
+        // Allow empty word for empty textarea for onInput to show all suggestions
+        if (text.length === 0 && startIndex === 0 && actualEndIndex === 0){}
+        else if (!validStartContext && !(startIndex < text.length && /[a-zA-Z0-9_]/.test(text[startIndex]))) return null;
+
+
+    }
+
+    return {
+      word: wordForFiltering,
+      fullWord: text.substring(startIndex, actualEndIndex),
+      position: {
+        start: startIndex,
+        end: actualEndIndex,
+        cursor: cursorPosition
+      }
+    };
+  }
+
+  filterSuggestions(wordToMatch) {
+    const variables = this.getVariables();
+    if (wordToMatch === null || wordToMatch === undefined) return [];
+    return variables.filter(variable => variable.toLowerCase().startsWith(wordToMatch.toLowerCase()));
+  }
+
+  displaySuggestions(suggestions, currentWordInfo) {
+    this.suggestionsContainer.innerHTML = '';
+    this.activeSuggestionIndex = -1; 
+
+    if (suggestions.length === 0 || !currentWordInfo || !currentWordInfo.position) {
+      this.hideSuggestions();
+      return;
+    }
+
+    suggestions.forEach((suggestionText, index) => {
+      const item = document.createElement('div');
+      item.classList.add('suggestion-item');
+      // Sanitize suggestionText before setting it as textContent
+      const tempDiv = document.createElement('div');
+      tempDiv.textContent = suggestionText;
+      item.innerHTML = tempDiv.innerHTML; // Basic sanitization
+
+      item.addEventListener('click', () => {
+        const text = this.textarea.value;
+        this.textarea.value = text.substring(0, currentWordInfo.position.start) + suggestionText + text.substring(currentWordInfo.position.end);
+        this.textarea.focus();
+        const newCursorPos = currentWordInfo.position.start + suggestionText.length;
+        this.textarea.selectionStart = this.textarea.selectionEnd = newCursorPos;
+        this.hideSuggestions();
+        const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+        this.textarea.dispatchEvent(inputEvent);
+      });
+      item.addEventListener('mouseenter', () => {
+        this.setActiveSuggestion(index);
+      });
+      this.suggestionsContainer.appendChild(item);
+    });
+
+    const text = this.textarea.value;
+    const { start: wordStartIndexInText } = currentWordInfo.position;
+    
+    const hiddenDiv = document.createElement('div');
+    const styles = getComputedStyle(this.textarea);
+    const relevantStyles = ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 
+                            'letterSpacing', 'lineHeight', 'paddingTop', 'paddingRight', 
+                            'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderRightWidth', 
+                            'borderBottomWidth', 'borderLeftWidth', 'whiteSpace', 'wordWrap', 
+                            'wordBreak', 'boxSizing', 'textAlign'];
+    relevantStyles.forEach(key => {
+        if (styles[key]) {
+            hiddenDiv.style[key] = styles[key];
+        }
+    });
+    hiddenDiv.style.position = 'absolute';
+    hiddenDiv.style.visibility = 'hidden';
+    hiddenDiv.style.left = '-9999px'; 
+    hiddenDiv.style.top = '-9999px';
+    hiddenDiv.style.width = this.textarea.clientWidth + 'px'; 
+    hiddenDiv.style.height = 'auto'; 
+    
+    const textBeforeWordStart = text.substring(0, wordStartIndexInText);
+    const markerSpan = document.createElement('span');
+    // markerSpan.textContent = '.'; // Minimal content for measurement - or even empty
+    hiddenDiv.textContent = textBeforeWordStart; // Use textContent for security
+    hiddenDiv.appendChild(markerSpan);    
+    
+    document.body.appendChild(hiddenDiv);
+
+    const textareaRect = this.textarea.getBoundingClientRect();
+    const markerRelativeTop = markerSpan.offsetTop;
+    const markerRelativeLeft = markerSpan.offsetLeft;
+    
+    document.body.removeChild(hiddenDiv);
+
+    let topPosition = textareaRect.top + markerRelativeTop - this.textarea.scrollTop + parseFloat(styles.lineHeight || '0');
+    let leftPosition = textareaRect.left + markerRelativeLeft - this.textarea.scrollLeft;
+
+    this.suggestionsContainer.style.top = `${topPosition}px`;
+    this.suggestionsContainer.style.left = `${leftPosition}px`;
+    this.suggestionsContainer.style.display = 'block';
+    this.setActiveSuggestion(0);
+  }
+
+  hideSuggestions() {
+    this.suggestionsContainer.innerHTML = '';
+    this.suggestionsContainer.style.display = 'none';
+    this.activeSuggestionIndex = -1;
+  }
+
+  onInput() {
+    const currentWordInfo = this.extractCurrentWord();
+    
+    if (currentWordInfo) { 
+      if (currentWordInfo.word.length > 0) {
+        const suggestions = this.filterSuggestions(currentWordInfo.word);
+        if (suggestions.length > 0) {
+          this.displaySuggestions(suggestions, currentWordInfo);
+        } else {
+          this.hideSuggestions();
+        }
+      } else { 
+        const allVariables = this.getVariables();
+        if (allVariables.length > 0) {
+          this.displaySuggestions(allVariables, currentWordInfo);
+        } else {
+          this.hideSuggestions();
+        }
+      }
+    } else {
+      this.hideSuggestions();
+    }
+  }
+  
+  setActiveSuggestion(index) {
+    const items = this.suggestionsContainer.querySelectorAll('.suggestion-item');
+    if (this.activeSuggestionIndex > -1 && items[this.activeSuggestionIndex]) {
+        items[this.activeSuggestionIndex].classList.remove('active');
+    }
+    if (index > -1 && items[index]) {
+        items[index].classList.add('active');
+        items[index].scrollIntoView({ block: 'nearest' });
+    }
+    this.activeSuggestionIndex = index;
+  }
+
+  handleKeyDown(event) {
+    const items = this.suggestionsContainer.querySelectorAll('.suggestion-item');
+    if (this.suggestionsContainer.style.display === 'none' || items.length === 0) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.setActiveSuggestion((this.activeSuggestionIndex + 1) % items.length);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.setActiveSuggestion((this.activeSuggestionIndex - 1 + items.length) % items.length);
+    } else if (event.key === 'Enter' || event.key === 'Tab') {
+      if (this.activeSuggestionIndex !== -1) {
+        event.preventDefault();
+        items[this.activeSuggestionIndex].click(); 
+      }
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.hideSuggestions();
+    }
+  }
+
+  init() {
+    this.textarea.addEventListener('input', this.onInput);
+    this.textarea.addEventListener('blur', () => setTimeout(this.hideSuggestions, 100)); 
+    this.textarea.addEventListener('keydown', (e) => this.handleKeyDown(e));
+  }
+}
+
     // **DOM Elements and State**
     const editor = document.querySelector('.editor'); // Textarea for input
     const resultsDiv = document.querySelector('.results'); // Div to display results
     let scope = {}; // Global scope to persist variable values
     let undoStack = []; // Stack to store editor states for undo
     let currentFileName = null; // Variable to store the current file name for "Save" vs "Save As"
+
+   // Autocomplete Initialization
+   const suggestionsContainer = document.querySelector('.autocomplete-suggestions');
+   if (editor && suggestionsContainer) {
+     // Pass the scope as a function to the Autocomplete constructor
+     const autocomplete = new Autocomplete(editor, suggestionsContainer);
+     autocomplete.init();
+   } else {
+     console.error('Editor or suggestions container not found for autocomplete initialization.');
+   }
 
     function clearPage() {
       editor.value = '';

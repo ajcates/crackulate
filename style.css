@@ -155,3 +155,28 @@
       padding: 0;
       line-height: var(--line-height);
     }
+
+.autocomplete-suggestions {
+  display: none; /* Hidden by default */
+  position: absolute; /* Or relative, depending on layout needs */
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 100; /* Ensure it's above other elements */
+  max-height: 150px;
+  overflow-y: auto;
+  width: auto; /* Or a specific width, e.g., same as textarea */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.autocomplete-suggestions .suggestion-item { /* Assuming items will have this class */
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.autocomplete-suggestions .suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+.autocomplete-suggestions .suggestion-item strong {
+  font-weight: bold; /* For highlighting matched part */
+}
