@@ -11,8 +11,7 @@ let currentFileName = null; // Variable to store the current file name for "Save
 // **Update Results Function**
 // Processes each line of the editor and updates the results display
 function updateResults() {
-  const lines = editor.value.split('
-');
+  const lines = editor.value.split('\n');
   const results = [];
   // Create a temporary scope for this evaluation run, starting with globalScope
   // This tempScope will be modified by assignments within the lines
@@ -27,7 +26,7 @@ function updateResults() {
     try {
       const tokens = lexer(trimmedLine);
       if (tokens.length === 0) {
-        results.push('-');
+        results.push('0');
         return;
       }
       const parser = new Parser(tokens);
@@ -78,10 +77,7 @@ function initializeEditorUI() {
   // **Initialize Editor**
   // Load saved content or use default example
   const savedContent = localStorage.getItem('calcedit_content');
-  editor.value = savedContent || 'foo = 1+1
-foo
-bar = 1
-foobar = bar + #2';
+  editor.value = savedContent || 'foo = 1+1\nfoo l\nbar = 1\nfoobar = bar + #2';
   undoStack = [editor.value]; // Initialize undo stack with initial content
   updateResults(); // Initial render
 
