@@ -156,26 +156,30 @@
       line-height: var(--line-height);
     }
 
-    #variable-toolbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background-color: #f0f0f0;
-      padding: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-    }
+#variable-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: var(--half-padding);
+  background-color: var(--surface);
+  border-top: 1px solid var(--outline);
+  box-sizing: border-box;
+  z-index: 100; /* Ensure it's above other content */
+}
 
-    .variable-button {
-      margin: 5px;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      cursor: pointer;
-    }
+#variable-toolbar button {
+  background-color: var(--primary);
+  color: var(--text-primary);
+  border: none;
+  padding: var(--half-padding) var(--padding);
+  cursor: pointer;
+  margin-right: var(--half-padding);
+  margin-bottom: var(--half-padding);
+}
 
-    .variable-button:hover {
-      background-color: #e0e0e0;
-    }
+#variable-toolbar button:hover {
+  opacity: 0.8;
+}
