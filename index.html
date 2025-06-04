@@ -38,7 +38,7 @@
     <textarea class="editor" spellcheck="false"></textarea>
     <div class="results"></div>
   </div>
-
+  <div id="variable-toolbar"></div>
   <script>
     // **Service Worker Registration**
     // Registers a service worker for offline functionality if supported by the browser
@@ -291,6 +291,31 @@
 
       scope = { ...tempScope }; // Update global scope with the new values
       resultsDiv.innerHTML = results.map(result => `<div>${result}</div>`).join('');
+
+      // Update variable toolbar
+      const toolbar = document.getElementById('variable-toolbar');
+      toolbar.innerHTML = ''; // Clear existing buttons
+      const variables = Object.keys(scope);
+      variables.forEach(variableName => {
+        const button = document.createElement('button');
+        button.textContent = variableName;
+        button.className = 'variable-button'; // Add class for styling
+        button.dataset.variable = variableName; // Store variable name
+
+        button.addEventListener('click', (event) => {
+          const varToInsert = event.target.dataset.variable;
+          // const editor = document.querySelector('.editor'); // editor is already a global const
+          const cursorPos = editor.selectionStart;
+          const currentValue = editor.value;
+          editor.value = currentValue.substring(0, cursorPos) + varToInsert + currentValue.substring(cursorPos);
+          editor.selectionStart = editor.selectionEnd = cursorPos + varToInsert.length;
+          editor.focus();
+          undoStack.push(editor.value); // Add to undo stack
+          debouncedUpdate(); // Trigger update
+        });
+
+        toolbar.appendChild(button);
+      });
     }
     // **Debounce Function**
     // Limits the frequency of updateResults calls during typing
