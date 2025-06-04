@@ -16,7 +16,7 @@ function updateResults() {
   const results = [];
   // Create a temporary scope for this evaluation run, starting with globalScope
   // This tempScope will be modified by assignments within the lines
-  let tempScope = { ...globalScope };
+  let tempScope = {};
 
   lines.forEach((line, index) => {
     const trimmedLine = line.trim();
