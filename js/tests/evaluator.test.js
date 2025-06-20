@@ -116,6 +116,67 @@ try {
     console.error(`  FAIL: Sequential operations with evolving scope. Error: ${e.message}. Current scope: ${JSON.stringify(currentScope)}`);
 }
 
+// Test Suite for User-Provided Multi-Line Scenario
+console.log('Running test: User-provided multi-line scenario');
+let userScope = {};
+const userOperations = [
+  { input: 'foo = 1+1', expectedScopeKeys: ['foo'], expectedLineResult: 2 }, // foo=2
+  { input: '5 + Foo', expectedScopeKeys: ['foo'], expectedLineResult: 7 },   // 5+foo = 5+2=7
+  { input: 'bar = 1 + Foo', expectedScopeKeys: ['foo', 'bar'], expectedLineResult: 3 }, // bar=1+foo = 1+2=3
+  { input: 'bar + 8', expectedScopeKeys: ['foo', 'bar'], expectedLineResult: 11 },  // bar+8 = 3+8=11
+  { input: 'foobar = bar + #2', expectedScopeKeys: ['foo', 'bar', 'foobar'], expectedLineResult: 10, lineRefs: [null, 7, null, null, null] } // foobar = bar + line2_res = 3+7=10. Provide results of previous lines for #2 to work.
+];
+let userLineResults = [];
+
+try {
+  userOperations.forEach((op, index) => {
+    const tokens = lexer(op.input);
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+
+    // For line reference testing, pass the current list of results.
+    // The 'evaluate' function expects line numbers to be 1-based in the AST (e.g., #2).
+    // The 'results' array passed to evaluate should be 0-indexed containing results of previous lines.
+    // So, for 'foobar = bar + #2', when 'index' is 4 (0-indexed), lineResults should contain [2, 7, 3, 11].
+    // The ast for '#2' will have line: 2. evaluate will do ast.line - 1 = 1 (0-based index into results).
+
+    const lineResult = evaluate(ast, userScope, op.lineRefs || userLineResults, index);
+
+    if (lineResult !== op.expectedLineResult) {
+      throw new Error(`Line ${index + 1} ('${op.input}'): Expected result ${op.expectedLineResult}, got ${lineResult}. Current scope: ${JSON.stringify(userScope)}`);
+    }
+    userLineResults.push(lineResult);
+
+    // Verify scope keys (simple check, could be more thorough for values)
+    if (op.expectedScopeKeys) {
+      const currentKeys = Object.keys(userScope).sort();
+      const expectedKeys = op.expectedScopeKeys.sort();
+      if (JSON.stringify(currentKeys) !== JSON.stringify(expectedKeys)) {
+        throw new Error(`Line ${index + 1} ('${op.input}'): Scope keys mismatch. Expected ${JSON.stringify(expectedKeys)}, got ${JSON.stringify(currentKeys)}. Scope: ${JSON.stringify(userScope)}`);
+      }
+    }
+    // Check specific values if provided in a more complex test structure
+    // For example, after 'foo = 1+1', userScope.foo should be 2.
+    if (op.input.includes('=')) { // Basic check for assignments
+        const varName = op.input.split('=')[0].trim().toLowerCase();
+        if (userScope[varName] !== lineResult) {
+             throw new Error(`Line ${index + 1} ('${op.input}'): Scope value incorrect for ${varName}. Expected ${lineResult}, got ${userScope[varName]}. Scope: ${JSON.stringify(userScope)}`);
+        }
+    }
+
+  });
+  console.log('  PASS: User-provided multi-line scenario');
+  // Verify final scope state more precisely if needed
+  if (userScope.foo !== 2 || userScope.bar !== 3 || userScope.foobar !== 10) {
+    throw new Error(`Final scope values incorrect. Expected foo=2, bar=3, foobar=10. Got: ${JSON.stringify(userScope)}`);
+  }
+   console.log('  Final scope values PASS: foo=2, bar=3, foobar=10');
+
+
+} catch (e) {
+  console.error(`  FAIL: User-provided multi-line scenario. Error: ${e.message}. Final userLineResults: ${JSON.stringify(userLineResults)}`);
+}
+
 console.log("To run these tests, open your browser's developer console and look at the output after this script is loaded, or run it in a Node.js environment if the modules are compatible.");
 
 // Example of how you might run this in an HTML page:
