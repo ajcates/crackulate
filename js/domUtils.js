@@ -4,6 +4,7 @@ import { evaluate } from './evaluator.js';
 // **DOM Elements and State**
 const editor = document.querySelector('.editor'); // Textarea for input
 const resultsDiv = document.querySelector('.results'); // Div to display results
+const variableToolbar = document.getElementById('variable-toolbar');
 let globalScope = {}; // Global scope to persist variable values, renamed from scope
 let undoStack = []; // Stack to store editor states for undo
 let currentFileName = null; // Variable to store the current file name for "Save" vs "Save As"
@@ -15,7 +16,7 @@ function updateResults() {
   const results = [];
   // Create a temporary scope for this evaluation run, starting with globalScope
   // This tempScope will be modified by assignments within the lines
-  let tempScope = { ...globalScope }; 
+  let tempScope = {};
 
   lines.forEach((line, index) => {
     const trimmedLine = line.trim();
@@ -44,6 +45,7 @@ function updateResults() {
 
   globalScope = { ...tempScope }; // Update globalScope with the final state of tempScope
   resultsDiv.innerHTML = results.map(result => `<div>${result}</div>`).join('');
+  updateVariableToolbar();
 }
 
 // **Debounce Function**
@@ -70,6 +72,7 @@ function clearPage() {
   updateResults(); // Update display (should show '-' for results)
   localStorage.removeItem('calcedit_content'); // Clear autosaved content
   currentFileName = null; // Reset current file name
+  updateVariableToolbar();
 }
 
 // Encapsulates editor initialization and non-file-operation event listeners
@@ -80,6 +83,7 @@ function initializeEditorUI() {
   editor.value = savedContent || 'foo = 1+1\nfoo l\nbar = 1\nfoobar = bar + #2';
   undoStack = [editor.value]; // Initialize undo stack with initial content
   updateResults(); // Initial render
+  updateVariableToolbar();
 
   // **Editor Input Event**
   // Updates undo stack and triggers debounced update on input
@@ -100,6 +104,28 @@ function initializeEditorUI() {
   });
 }
 
+// **Update Variable Toolbar Function**
+// Clears and repopulates the variable toolbar with buttons for each variable in globalScope
+function updateVariableToolbar() {
+  variableToolbar.innerHTML = ''; // Clear existing buttons
+  Object.keys(globalScope).sort().forEach(varName => {
+    const button = document.createElement('button');
+    button.textContent = varName;
+    button.addEventListener('click', () => {
+      const cursorPos = editor.selectionStart;
+      const textBefore = editor.value.substring(0, cursorPos);
+      const textAfter = editor.value.substring(editor.selectionEnd);
+      editor.value = textBefore + varName + textAfter;
+      editor.selectionStart = editor.selectionEnd = cursorPos + varName.length;
+      editor.focus();
+      // Trigger an input event to update results and potentially the toolbar again
+      const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+      editor.dispatchEvent(inputEvent);
+    });
+    variableToolbar.appendChild(button);
+  });
+}
+
 // Export necessary functions and variables
 // currentFileName and globalScope will be managed via functions if needed by other modules later
-export { editor, resultsDiv, clearPage, updateResults, debouncedUpdate, initializeEditorUI, globalScope, currentFileName, undoStack };
+export { editor, resultsDiv, clearPage, updateResults, debouncedUpdate, initializeEditorUI, globalScope, currentFileName, undoStack, updateVariableToolbar };

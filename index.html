@@ -13,18 +13,18 @@
   <header>
     <ul>
       <li>
-        <button id="open">📂 Open</button>
-        <button id="save">💾 SaveAs</button>
-          <button id="new">📄 New</button>
-        <button id="lineref">#️⃣ LineRef</button>
-        <button id="undo">↩️ Undo</button>
+        <button id="new">New</button>
+        <button id="open">Open</button>
+        <button id="save">Save</button>
+        <!--<button id="lineref">Lineref</button> -->
+        <button id="undo">Undo</button>
       </li>
     </ul>
   </header>
   <div class="hidden modal" id="files">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Open File</h2>
+        <h2>📂Open File</h2>
         <button class="close">×</button>
       </div>
       <div class="modal-body">
@@ -38,6 +38,7 @@
     <textarea class="editor" spellcheck="false"></textarea>
     <div class="results"></div>
   </div>
+  <div id="variable-toolbar"></div>
 
   <script type="module" src="main.js"></script>
 </body>
