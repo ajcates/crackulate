@@ -80,7 +80,7 @@ function initializeEditorUI() {
   // **Initialize Editor**
   // Load saved content or use default example
   const savedContent = localStorage.getItem('calcedit_content');
-  editor.value = savedContent || 'foo = 1+1\nfoo l\nbar = 1\nfoobar = bar + #2';
+  editor.value = savedContent || '// Simple interest calculation\\nprincipal = 1000\\nrate = 0.05 // 5% annual rate\\ntime = 2    // 2 years\\n\\ninterest = principal * rate * time\\ntotal_amount = principal + interest\\n\\n// Reference previous line result (interest is on line 6)\\ndouble_interest = #6 * 2';
   undoStack = [editor.value]; // Initialize undo stack with initial content
   updateResults(); // Initial render
   updateVariableToolbar();
