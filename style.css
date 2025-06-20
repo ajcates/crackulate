@@ -1,13 +1,43 @@
 /*
- * this wikl be an amoled mataeril 3 theme
- * using relative units for font-size and padding and margin
- * Define a dark theme with CSS variables */
+ * this will be the css for the dark theme
+ * it will have a github like style
+ * it will have a very dark background
+ * it will have snazzy animations
+ * it will have a modern look
+ * it will have a clean design
+ * it will have a minimalistic design
+ * it will have a professional look
+ * it will use CSS variables for easy customization
+ * and maintainability
+ * it will also be responsive
+ * it will use flexbox for layout
+ * it will use a monospace font for code
+ * it will have a fixed header
+ * it will have a modal for file selection
+ * it will have a side-by-side layout for the editor and results
+ * it will have a variable toolbar at the bottom
+ * it will have a file list in the modal
+ * it will have a close button in the modal
+ * it will have a hover effect for buttons
+ * it will have a hover effect for file list items
+ * it will have a dark background
+ * it will have a light text color
+ * it will have a primary color for buttons and highlights
+ * the buttons will have subtle gradients
+ * it will have a consistent padding and margin
+ * it will have a consistent font size and line height
+ * the butttons will have a rounded corners
+ * the colors will be green, blue, and purple
+ * it will have a consistent color scheme
+ * Define a dark theme with CSS variables
+ * */
 
     :root {
       --background: #121212;
       --surface: #1E1E1E;
       --text-primary: #E0E0E0;
-      --primary: #BB86FC;
+      --primary: lawngreen;
+      --accent: deeppink;
       --outline: #3C3C3C;
       --font-size: 16px; /* 16px */
       --line-height: 1.5;
@@ -17,95 +47,299 @@
       --right-margin: 1em; /* 16px */
     }
 
+    /* General styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --font-size: 16px; /* 16px */
+      --line-height: 1.5;
+      --padding: 1em; /* 16px */
+      --half-padding: 0.5em; /* 8px */
+      --left-margin: 1em; /* 16px */
+      --right-margin: 1em; /* 16px */
+      --background: #121212;
+      --surface: #1E1E1E;
+      --text-primary: #E0E0E0;
+
+
+      /*radiocactice aqua colot*/
+      --primary-dark: color-mix(in hsl, var(--primary), #000000 30%);
+      --accent-dark: crimson;
+      --outline: #3C3C3C;
+      --font-family: 'Roboto Mono', monospace;
+      --font-weight: 400;
+      --font-style: normal;
+      --text-decoration: none;
+      --text-transform: none;
+      --text-align: left;
+      --text-shadow: none;
+      --border-radius: 4px; /* 4px */
+      --transition: all 0.3s ease; /* Smooth transitions */
+      --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      --max-width: 1200px; /* Max width for content */
+      --max-height: 100vh; /* Max height for content */
+      --scrollbar-width: 8px; /* Width of the scrollbar */
+      --scrollbar-color: #3C3C3C; /* Color of the scrollbar */
+      --scrollbar-thumb-color: #BB86FC; /* Color of the scrollbar thumb */
+      --scrollbar-thumb-hover-color: #9B59B6; /* Color of the scrollbar thumb on hover */
+      --scrollbar-track-color: #1E1E1E; /* Color of the scrollbar track */
+      --scrollbar-track-hover-color: #2C2C2C; /* Color of the scrollbar track on hover */
+      --scrollbar-thumb-border-radius: 4px; /* Border radius for the scrollbar thumb */
+      --scrollbar-track-border-radius: 4px; /* Border radius for the scrollbar track */
+      --scrollbar-thumb-border: 1px solid rgba(255, 255, 255, 0.2); /* Border for the scrollbar thumb */
+      --scrollbar-track-border: 1px solid rgba(255, 255, 255, 0.1); /* Border for the scrollbar track */
+      --scrollbar-thumb-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); /* Box shadow for the scrollbar thumb */
+      --scrollbar-track-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); /* Box shadow for the scrollbar track */
+      --scrollbar-thumb-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar thumb */
+      --scrollbar-track-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar track */
+      --scrollbar-thumb-hover-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar thumb on hover */
+      --scrollbar-track-hover-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar track on hover */
+      --scrollbar-thumb-active-color: #8E44AD; /* Color of the scrollbar thumb when active */
+      --scrollbar-track-active-color: #2C3E50; /* Color of the scrollbar track when active */
+      --scrollbar-thumb-active-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar thumb when active */
+      --scrollbar-track-active-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar track when active */
+      --scrollbar-thumb-active-border: 1px solid rgba(255, 255, 255, 0.3); /* Border for the scrollbar thumb when active */
+      --scrollbar-track-active-border: 1px solid rgba(255, 255, 255, 0.2); /* Border for the scrollbar track when active */
+      --scrollbar-thumb-active-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.7); /* Box shadow for the scrollbar thumb when active */
+    }
+    html {
+      font-size: 16px; /* 16px */
+      scroll-behavior: smooth;
+    }
+    /* Body styling */
+    body, html {
+      height: 100%;
+      width: 100%;
+      overflow: hidden; /* Prevents scrolling */
+    }
     body {
       background-color: var(--background);
-      margin: 0;
-      font-size: var(--font-size);
-      font-family: 'Roboto Mono', monospace;
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-weight: var(--font-weight);
+      font-style: var(--font-style);
+      text-decoration: var(--text-decoration);
+      text-transform: var(--text-transform);
+      text-align: var(--text-align);
+      text-shadow: var(--text-shadow);
     }
 
     /* Header styling */
     header {
-      background-color: var(--surface);
-      padding: var(--padding);
-    }
-
-    header ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-    }
-
-    header li {
-      margin-right: calc(var(--left-margin) / 2);
-    }
-
-    header button {
-      background-color: var(--primary);
-      color: var(--text-primary);
-      border: none;
-      padding: var(--half-padding) var(--padding);
-      cursor: pointer;
-    }
-
-    header button:hover {
-      opacity: 0.8;
-    }
-
-    /* Modal styling */
-    .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000; /* Ensure header is above other content */
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
+      background-color: var(--background);
+      color: var(--text-primary);
+      font-size: var(--font-size);
+    }
+    header h1 {
+      margin-left: var(--left-margin);
+      font-size: calc(var(--font-size) * 1.5); /* 24px */
+    }
+    header nav {
+      margin-right: var(--right-margin);
+    }
+    header ul {
+      display: flex;
+      align-items: center;
+      margin: var(--half-padding) 0;
+      padding: 0;
     }
 
+    header li {
+      list-style: none;
+      margin-right: var(--left-margin);
+      color: var(--text-primary);
+      font-size: var(--font-size);
+    }
+
+    header button {
+      background-color: var(--primary);
+      border-radius: var(--border-radius); /* Rounded corners */
+      background: linear-gradient(180deg, var(--primary),var(--primary-dark)); /* Subtle gradient */
+      text-shadow: 0px -1px 0px rgba(255,255,255, 0.3); /* Subtle text shadow */
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1); /* Subtle inset shadow */
+      border: 1px solid var(--outline);
+      font-weight: medium;
+      color: rgba(0,0,0,0.9); /* Slightly transparent white */
+      border: none;
+      padding: var(--half-padding) var(--padding);
+      cursor: pointer;
+      font-size: var(--font-size);
+      transition: opacity 0.3s ease;
+    }
+
+    header button:focus {
+      outline: none; /* Remove focus outline */
+    }
+    header button:active {
+      opacity: 0.6; /* Slightly darker when clicked */
+    }
+    header button:focus-visible {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    header button:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
+    header button:hover {
+      background-color: var(--primary);
+      opacity: 0.9; /* Slightly lighter on hover */
+    }
+
+    /* Modal styling */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000; /* Ensure modal is above other content */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* Enable scrolling if needed */
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    }
+    .modal.show {
+      display: block; /* Show modal when class is added */
+    }
+    .modal-header, .modal-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-header {
+      padding: var(--padding);
+      border-bottom: 1px solid var(--outline);
+    }
+    .modal-header h2 {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: calc(var(--font-size) * 1.25); /* 20px */
+    }
     .modal-content {
       background: var(--surface);
       border: 1px solid var(--outline);
       padding: calc(var(--padding) * 2);
       max-width: 400px;
+      margin: auto; /* Center modal */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+      border-radius: var(--border-radius); /* Rounded corners */
+    }
+    .modal-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
       width: 100%;
     }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--padding);
-    }
-
-    .modal-header h2 {
-      margin: 0;
+    .modal-content li {
+      padding: var(--half-padding) var(--padding);
+      cursor: pointer;
       color: var(--text-primary);
+      transition: background-color 0.3s ease; /* Smooth hover effect */
     }
-
+    .modal-content li:hover {
+      background: var(--outline); /* Change background on hover */
+    }
+    .modal-content li:focus {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    .modal-content li:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
+    .modal-content li:focus-visible {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    .modal-content li:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
     .close {
       background: none;
       border: none;
       color: var(--text-primary);
       font-size: 20px;
       cursor: pointer;
+      position: absolute;
+      top: var(--padding);
+      right: var(--padding);
     }
-
     .close:hover {
       color: var(--primary);
     }
+    .close:focus {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    .close:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
+    .close:focus-visible {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    .close:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
+    /* File list styling */
 
+    .file-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 300px; /* Limit height for scrolling */
+      overflow-y: auto; /* Enable vertical scrolling */
+      background-color: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--border-radius); /* Rounded corners */
+    }
+
+    .file-list h3 {
+      margin: 0;
+      padding: var(--half-padding) var(--padding);
+      color: var(--text-primary);
+      font-size: calc(var(--font-size) * 1.25); /* 20px */
+      border-bottom: 1px solid var(--outline);
+    }
+    .file-list ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
     .file-list li {
       padding: var(--half-padding) var(--padding);
       cursor: pointer;
       color: var(--text-primary);
+      transition: background-color 0.3s ease; /* Smooth hover effect */
+    }
+    .file-list li:hover {
+      background: var(--outline); /* Change background on hover */
+    }
+    .file-list li:focus {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
     }
 
-    .file-list li:hover {
-      background: var(--outline);
+    .file-list li:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
+
+    .file-list li:focus-visible {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    .file-list li:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
     }
 
     .hidden {
@@ -115,45 +349,55 @@
     /* Flex container for side-by-side layout */
     .container {
       display: flex;
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: var(--surface);
-      border: 1px solid var(--outline);
-      font-size: var(--font-size);
+      height: 100vh; /* Full viewport height */
+      padding-top: calc(var(--padding)*3); /* Space for fixed header */
     }
-
-    /* Textarea on the left */
+    /* Side-by-side layout */
+    
     .editor {
-      flex: 1;
-      padding: var(--padding);
-      font-size: var(--font-size);
-      line-height: var(--line-height);
-      color: var(--text-primary);
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: calc(100vh - 60px); /* Full height minus header */
+      overflow: hidden; /* Prevents scrolling */
       background-color: var(--surface);
-      border: none;
-      outline: none;
-      resize: none;
-      box-sizing: border-box;
-      white-space: pre;
-      overflow-x: auto;
-      overflow-y: scroll;
-    }
-
-    /* Results pane on the right */
-    .results {
-      width: 100px;
-      padding: var(--padding);
+      color: var(--text-primary);
+      font-family: var(--font-family);
       font-size: var(--font-size);
       line-height: var(--line-height);
-      color: var(--primary);
-      text-align: right;
       box-sizing: border-box;
+      flex-wrap: nowrap;
+      flex-grow: 1;
+      flex: 90;
+      padding: var(--half-padding);
+
     }
 
+    .results {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: calc(100vh - 60px); /* Full height minus header */
+      overflow: hidden; /* Prevents scrolling */
+      background-color: var(--surface);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+      box-sizing: border-box;
+      text-align: right;
+      border-left: 2px solid var(--outline);
+      padding: var(--half-padding);
+      scroll-behavior: smooth;      
+      flex: 10;
+
+    }
+    /* Results pane on the right */
+	
+    
     .results div {
       margin: 0;
       padding: 0;
-      line-height: var(--line-height);
     }
 
 #variable-toolbar {
@@ -171,15 +415,28 @@
 }
 
 #variable-toolbar button {
-  background-color: var(--primary);
   color: var(--text-primary);
-  border: none;
+  background: linear-gradient(180deg, var(--accent),var(--accent-dark)); /* Subtle gradient */
+  border: 1px solid var(--outline);
   padding: var(--half-padding) var(--padding);
   cursor: pointer;
   margin-right: var(--half-padding);
   margin-bottom: var(--half-padding);
+  /* pill like shape with random corners */
+  border-radius: 20px; /* Rounded corners */
+  
 }
 
 #variable-toolbar button:hover {
-  opacity: 0.8;
+opacity: 0.8;
 }
+
+/*suggestions for the style of the crackulator:
+ * * it should have a dark theme
+ * * it should have a modern look
+ * * it 
+ *
+ * 
+*/
+
+
