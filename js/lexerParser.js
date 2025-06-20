@@ -44,7 +44,7 @@ function lexer(input) {
         varName += input[i];
         i++;
       }
-      tokens.push({ type: TokenTypes.VARIABLE, value: varName });
+      tokens.push({ type: TokenTypes.VARIABLE, value: varName.toLowerCase() });
       continue;
     }
     if (['+', '-', '*', '/'].includes(char)) {
@@ -95,7 +95,7 @@ class Parser {
     const variable = this.consume().value;
     this.consume(); // '='
     const expression = this.parseExpression();
-    return { type: 'assignment', variable, expression };
+    return { type: 'assignment', variable: variable.toLowerCase(), expression };
   }
 
   parseExpression() {
@@ -125,7 +125,7 @@ class Parser {
       return { type: 'number', value: token.value };
     }
     if (token.type === TokenTypes.VARIABLE) {
-      return { type: 'variable', name: token.value };
+      return { type: 'variable', name: token.value.toLowerCase() };
     }
     if (token.type === TokenTypes.LINEREF) {
       return { type: 'lineref', line: token.value };

@@ -3,8 +3,9 @@ function evaluate(ast, scope, lineResults, currentLine) {
   if (!ast) return null;
   if (ast.type === 'number') return ast.value;
   if (ast.type === 'variable') {
-    if (!(ast.name in scope)) throw new Error(`Undefined variable: ${ast.name}`);
-    return scope[ast.name];
+    const varName = ast.name.toLowerCase();
+    if (!(varName in scope)) throw new Error(`Undefined variable: ${ast.name}`);
+    return scope[varName];
   }
   if (ast.type === 'lineref') {
     const lineIndex = ast.line - 1; // Convert to 0-based index
@@ -29,7 +30,7 @@ function evaluate(ast, scope, lineResults, currentLine) {
   if (ast.type === 'assignment') {
     const value = evaluate(ast.expression, scope, lineResults, currentLine);
     //shouldnt the scope also be retuened so the next line we eval can use
-    scope[ast.variable] = value;
+    scope[ast.variable.toLowerCase()] = value;
     return value;
   }
   throw new Error('Unknown AST node type');
