@@ -17,6 +17,7 @@ import { evaluate } from './evaluator.js';
 // These are references to key HTML elements that the script will interact with.
 const editor = document.querySelector('.editor'); // The main textarea where users type expressions.
 const resultsDiv = document.querySelector('.results'); // The div where calculation results are displayed.
+const lineNumbersDiv = document.querySelector('.line-numbers'); // The div for line numbers.
 const variableToolbar = document.getElementById('variable-toolbar'); // Toolbar for variable buttons.
 
 // Application state variables
@@ -78,7 +79,15 @@ function updateResults() {
   globalScope = { ...tempScope };
   // Update the results display in the DOM. Each result gets its own div.
   resultsDiv.innerHTML = results.map(result => `<div>${result}</div>`).join('');
+  updateLineNumbers(); // Update line numbers
   updateVariableToolbar(); // Refresh the variable toolbar to reflect any changes in globalScope.
+}
+
+// **Update Line Numbers Function**
+// This function updates the line number display next to the editor.
+function updateLineNumbers() {
+  const lineCount = editor.value.split('\n').length;
+  lineNumbersDiv.innerHTML = Array.from({ length: lineCount }, (_, i) => `<div>${i + 1}</div>`).join('');
 }
 
 // **Debounce Function**
@@ -112,6 +121,7 @@ function clearPage() {
   undoStack = ['']; // Reset the undo stack with a single empty state.
   globalScope = {}; // Clear all user-defined variables.
   updateResults(); // Update the display (should show '-' for results due to empty lines).
+  updateLineNumbers(); // Also update line numbers on clear
   localStorage.removeItem('calcedit_content'); // Remove any autosaved content from localStorage.
   currentFileName = null; // Reset the current file name as there's no file loaded.
   updateVariableToolbar(); // Clear the variable toolbar.
@@ -129,6 +139,7 @@ function initializeEditorUI() {
   // Initialize the undo stack with the initial content (either saved or default).
   undoStack = [editor.value];
   updateResults(); // Perform an initial calculation and display of results.
+  updateLineNumbers(); // Initialize line numbers
   updateVariableToolbar(); // Populate the variable toolbar based on the initial state.
 
   // **Editor Input Event Listener**
@@ -136,6 +147,12 @@ function initializeEditorUI() {
   editor.addEventListener('input', () => {
     undoStack.push(editor.value); // Save the current editor state to the undo stack.
     debouncedUpdate(); // Trigger the debounced update function to re-calculate and display results.
+  });
+
+  // **Editor Scroll Event Listener**
+  // Synchronizes the scrolling of the line numbers div with the editor textarea.
+  editor.addEventListener('scroll', () => {
+    lineNumbersDiv.scrollTop = editor.scrollTop;
   });
 
   // **Undo Button Event Listener**

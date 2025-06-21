@@ -353,13 +353,28 @@
       padding-top: calc(var(--padding)*3); /* Space for fixed header */
     }
     /* Side-by-side layout */
+    .line-numbers {
+      width: 40px; /* Fixed width for line numbers */
+      height: calc(100vh - 60px); /* Full height minus header */
+      background-color: var(--surface);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+      padding: var(--half-padding);
+      text-align: right;
+      overflow: hidden; /* Prevents its own scrollbar, will sync with editor */
+      user-select: none; /* Prevent text selection */
+      box-sizing: border-box;
+      border-right: 1px solid var(--outline); /* Optional: a separator line */
+    }
     
     .editor {
       display: flex;
       flex-direction: row;
       width: 100%;
       height: calc(100vh - 60px); /* Full height minus header */
-      overflow: hidden; /* Prevents scrolling */
+      overflow: auto; /* Enable scrolling for the editor itself */
       background-color: var(--surface);
       color: var(--text-primary);
       font-family: var(--font-family);
@@ -368,15 +383,18 @@
       box-sizing: border-box;
       flex-wrap: nowrap;
       flex-grow: 1;
-      flex: 90;
+      /* Adjust flex basis if needed, or rely on width of line-numbers and results */
+      flex: 1; /* Allow editor to take remaining space */
       padding: var(--half-padding);
-
+      /* Remove fixed width for editor if line-numbers and results have fixed/flex widths */
+      resize: none; /* Disable textarea resizing */
     }
 
     .results {
       display: flex;
       flex-direction: column;
-      width: 100%;
+      /* width: 100%; */ /* Let flexbox determine width */
+      min-width: 100px; /* Minimum width for results pane */
       height: calc(100vh - 60px); /* Full height minus header */
       overflow: hidden; /* Prevents scrolling */
       background-color: var(--surface);
@@ -389,7 +407,7 @@
       border-left: 2px solid var(--outline);
       padding: var(--half-padding);
       scroll-behavior: smooth;      
-      flex: 10;
+      flex: 0 0 120px; /* Don't grow, don't shrink, basis of 120px */
 
     }
     /* Results pane on the right */
