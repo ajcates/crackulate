@@ -135,7 +135,7 @@ function initializeEditorUI() {
   // Attempt to load content that was previously autosaved to localStorage.
   const savedContent = localStorage.getItem('calcedit_content');
   // If saved content exists, use it; otherwise, use a default example string.
-  editor.value = savedContent || 'foo = 1+1\nfoo l\nbar = 1\nfoobar = bar + #2'; // Note: 'foo l' might be a typo, 'foo' or 'foo+0' works.
+  editor.value = savedContent || 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2'; // Note: 'foo l' might be a typo, 'foo' or 'foo+0' works.
   // Initialize the undo stack with the initial content (either saved or default).
   undoStack = [editor.value];
   updateResults(); // Perform an initial calculation and display of results.
