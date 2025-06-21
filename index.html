@@ -24,13 +24,26 @@
   <div class="hidden modal" id="files">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>📂Open File</h2>
-        <button class="close">×</button>
+        <h2>📂 Open File</h2>
+        <button class="close-button" aria-label="Close dialog">×</button>
       </div>
       <div class="modal-body">
+        <div class="modal-search-container">
+          <input type="text" id="file-search-input" placeholder="Search files..." aria-label="Search files">
+        </div>
         <ul class="file-list" id="file-list">
-          <!-- File list will be populated here -->
+          <!-- File list will be populated here
+          Example list item structure:
+          <li data-filename="example.txt">
+            <span class="file-name">example.txt</span>
+            <span class="file-metadata">Last modified: N/A</span>
+            <button class="delete-file-button" aria-label="Delete example.txt">🗑️</button>
+          </li>
+          -->
         </ul>
+      </div>
+      <div class="modal-footer">
+        <p id="file-count">0 files</p>
       </div>
     </div>
   </div>

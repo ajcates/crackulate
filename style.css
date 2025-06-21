@@ -291,8 +291,53 @@
     .close:focus:not(:focus-visible) {
       outline: none; /* Remove focus outline when not focused */
     }
-    /* File list styling */
 
+    /* Renamed .close to .close-button for clarity */
+    .close-button {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 24px; /* Increased size slightly */
+      cursor: pointer;
+      position: absolute;
+      top: var(--padding);
+      right: var(--padding);
+      line-height: 1; /* Ensure consistent alignment */
+    }
+    .close-button:hover {
+      color: var(--primary);
+    }
+    .close-button:focus {
+      outline: 2px solid var(--primary); /* Visible focus outline */
+      outline-offset: 2px; /* Offset for better visibility */
+    }
+    .close-button:focus:not(:focus-visible) {
+      outline: none; /* Remove focus outline when not focused */
+    }
+
+    /* Modal Search Input Styling */
+    .modal-search-container {
+      margin-bottom: var(--padding);
+      width: 100%;
+    }
+
+    #file-search-input {
+      width: 100%;
+      padding: var(--half-padding);
+      background-color: var(--background); /* Darker than surface for contrast */
+      color: var(--text-primary);
+      border: 1px solid var(--outline);
+      border-radius: var(--border-radius);
+      font-size: var(--font-size);
+    }
+
+    #file-search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-dark);
+    }
+
+    /* File list styling */
     .file-list {
       list-style: none;
       padding: 0;
@@ -302,44 +347,81 @@
       background-color: var(--surface);
       border: 1px solid var(--outline);
       border-radius: var(--border-radius); /* Rounded corners */
+      width: 100%; /* Ensure full width within modal body */
     }
 
-    .file-list h3 {
-      margin: 0;
-      padding: var(--half-padding) var(--padding);
-      color: var(--text-primary);
-      font-size: calc(var(--font-size) * 1.25); /* 20px */
-      border-bottom: 1px solid var(--outline);
-    }
-    .file-list ul {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
+    /* Individual file item styling */
     .file-list li {
+      display: flex; /* Use flexbox for layout */
+      justify-content: space-between; /* Space out items */
+      align-items: center; /* Vertically align items */
       padding: var(--half-padding) var(--padding);
       cursor: pointer;
       color: var(--text-primary);
-      transition: background-color 0.3s ease; /* Smooth hover effect */
+      transition: background-color 0.2s ease, border-left-color 0.2s ease; /* Smooth hover effect */
+      border-bottom: 1px solid var(--outline); /* Separator for items */
+      border-left: 3px solid transparent; /* For selection indication */
     }
+
+    .file-list li:last-child {
+      border-bottom: none; /* Remove border for the last item */
+    }
+
     .file-list li:hover {
-      background: var(--outline); /* Change background on hover */
-    }
-    .file-list li:focus {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
+      background-color: var(--outline); /* Change background on hover */
     }
 
-    .file-list li:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
+    .file-list li.selected {
+      background-color: color-mix(in hsl, var(--primary) 20%, var(--surface));
+      border-left: 3px solid var(--primary);
     }
 
-    .file-list li:focus-visible {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
+    .file-list li .file-name {
+      flex-grow: 1; /* Allow file name to take available space */
+      margin-right: var(--half-padding); /* Space before metadata/button */
     }
-    .file-list li:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
+
+    .file-list li .file-metadata {
+      font-size: calc(var(--font-size) * 0.8); /* Smaller text for metadata */
+      color: color-mix(in hsl, var(--text-primary) 70%, var(--surface)); /* Muted color */
+      margin-right: var(--padding); /* Space before delete button */
+      white-space: nowrap; /* Prevent wrapping */
+    }
+
+    .delete-file-button {
+      background: none;
+      border: none;
+      color: var(--text-primary); /* Muted color, less prominent */
+      font-size: calc(var(--font-size) * 1.2); /* Slightly larger for better click target */
+      cursor: pointer;
+      padding: var(--half-padding); /* Add some padding for easier clicking */
+      border-radius: var(--border-radius);
+      transition: color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .delete-file-button:hover {
+      color: var(--accent); /* Destructive action color on hover */
+      background-color: color-mix(in hsl, var(--accent) 15%, var(--surface));
+    }
+
+    .delete-file-button:focus {
+      outline: 2px solid var(--accent-dark);
+      outline-offset: 1px;
+    }
+
+    /* Modal Footer Styling */
+    .modal-footer {
+      margin-top: var(--padding);
+      padding-top: var(--padding);
+      border-top: 1px solid var(--outline);
+      width: 100%;
+      text-align: right; /* Align text to the right */
+      font-size: calc(var(--font-size) * 0.9);
+      color: color-mix(in hsl, var(--text-primary) 80%, var(--surface));
+    }
+
+    #file-count {
+      margin: 0;
     }
 
     .hidden {
