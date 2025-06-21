@@ -49,7 +49,21 @@ function evaluate(ast, scope, lineResults, currentLine) {
       throw new Error(`Cannot reference an error: #${ast.line}`);
     }
     // Convert the referenced result (which might be a string) to a floating-point number.
-    return parseFloat(refValue);
+    // Recursively evaluate the left and right operands of the binary expression.
+    const left = evaluate(ast.left, scope, lineResults, currentLine);
+    const right = evaluate(ast.right, scope, lineResults, currentLine);
+    // Perform the operation based on the operator type.
+    switch (ast.operator) {
+      case '+': return left + right;
+      case '-': return left - right;
+      case '*': return left * right;
+      case '/':
+        // Handle division by zero: return NaN (Not a Number).
+        // The updateResults function in domUtils.js will typically display this as '0' or handle it.
+        return right === 0 ? NaN : left / right;
+      default:
+        // If the operator is unknown, it's an error.
+        throw new Error(`Unknown operator: ${ast.operator}`);
   }
 
   // Handle binary operations (e.g., addition, subtraction).
