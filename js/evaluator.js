@@ -1,10 +1,10 @@
 // **Evaluator Function**
 function evaluate(ast, scope, lineResults, currentLine) {
-  if (!ast) return null;
-  if (ast.type === 'number') return ast.value;
+  if (!ast) return { result: null, scope };
+  if (ast.type === 'number') return { result: ast.value, scope };
   if (ast.type === 'variable') {
     if (!(ast.name in scope)) throw new Error(`Undefined variable: ${ast.name}`);
-    return scope[ast.name];
+    return { result: scope[ast.name], scope };
   }
   if (ast.type === 'lineref') {
     const lineIndex = ast.line - 1; // Convert to 0-based index
@@ -13,24 +13,31 @@ function evaluate(ast, scope, lineResults, currentLine) {
     }
     const refValue = lineResults[lineIndex];
     if (refValue === 'e') throw new Error(`Cannot reference an error: #${ast.line}`);
-    return parseFloat(refValue);
+    return { result: parseFloat(refValue), scope };
   }
   if (ast.type === 'binary') {
-    const left = evaluate(ast.left, scope, lineResults, currentLine);
-    const right = evaluate(ast.right, scope, lineResults, currentLine);
+    const leftEval = evaluate(ast.left, scope, lineResults, currentLine);
+    scope = leftEval.scope; // Update scope from left evaluation
+    const rightEval = evaluate(ast.right, scope, lineResults, currentLine);
+    scope = rightEval.scope; // Update scope from right evaluation
+
+    const left = leftEval.result;
+    const right = rightEval.result;
+
     switch (ast.operator) {
-      case '+': return left + right;
-      case '-': return left - right;
-      case '*': return left * right;
-      case '/': return right === 0 ? NaN : left / right;
+      case '+': return { result: left + right, scope };
+      case '-': return { result: left - right, scope };
+      case '*': return { result: left * right, scope };
+      case '/': return { result: right === 0 ? NaN : left / right, scope };
       default: throw new Error(`Unknown operator: ${ast.operator}`);
     }
   }
   if (ast.type === 'assignment') {
-    const value = evaluate(ast.expression, scope, lineResults, currentLine);
-    //shouldnt the scope also be retuened so the next line we eval can use
-    scope[ast.variable] = value;
-    return value;
+    const evalExpression = evaluate(ast.expression, scope, lineResults, currentLine);
+    const value = evalExpression.result;
+    const newScope = { ...evalExpression.scope }; // Use the scope returned from expression evaluation
+    newScope[ast.variable] = value;
+    return { result: value, scope: newScope };
   }
   throw new Error('Unknown AST node type');
 }

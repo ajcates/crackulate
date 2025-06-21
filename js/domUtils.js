@@ -16,7 +16,7 @@ function updateResults() {
   const results = [];
   // Create a temporary scope for this evaluation run, starting with globalScope
   // This tempScope will be modified by assignments within the lines
-  let tempScope = {};
+  let tempScope = { ...globalScope }; // Initialize with globalScope
 
   lines.forEach((line, index) => {
     const trimmedLine = line.trim();
@@ -35,7 +35,9 @@ function updateResults() {
       if (parser.hasNext()) {
         throw new Error('Extra tokens after expression');
       }
-      const result = evaluate(ast, tempScope, results, index); // Pass tempScope
+      const evalOutput = evaluate(ast, tempScope, results, index); // Pass tempScope
+      tempScope = evalOutput.scope; // Update tempScope with the scope returned from evaluate
+      const result = evalOutput.result;
       results.push(result === null || isNaN(result) ? '0' : result.toString());
     } catch (e) {
       console.error(e); // Log error to console for debugging
