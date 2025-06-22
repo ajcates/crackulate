@@ -14,16 +14,40 @@ import { lexer, Parser } from './lexerParser.js';
 import { evaluate } from './evaluator.js';
 
 // **DOM Elements and State**
-// These are references to key HTML elements that the script will interact with.
-const editor = document.querySelector('.editor'); // The main textarea where users type expressions.
-const resultsDiv = document.querySelector('.results'); // The div where calculation results are displayed.
-const lineNumbersDiv = document.querySelector('.line-numbers'); // The div for line numbers.
-const variableToolbar = document.getElementById('variable-toolbar'); // Toolbar for variable buttons.
 
-// Application state variables
-let globalScope = {}; // Stores variables and their values defined by the user. Persists across evaluations.
-let undoStack = []; // An array to store previous states of the editor content for undo functionality.
-let currentFileName = null; // Stores the name of the currently open file, if any. Used for save operations.
+// Main text area where users input their calculations.
+const editor = document.querySelector('.editor');
+// DIV element used to display the results of calculations for each line.
+const resultsDiv = document.querySelector('.results');
+// DIV element for displaying line numbers alongside the editor.
+const lineNumbersDiv = document.querySelector('.line-numbers');
+// DIV element that serves as a toolbar for dynamically created variable buttons.
+const variableToolbar = document.getElementById('variable-toolbar');
+
+// **Application State Variables**
+
+// `globalScope`: An object storing variables (and their values) defined by the user's calculations.
+// This scope persists across multiple evaluations within the same session until explicitly cleared (e.g., by `clearPage`).
+// It is updated by `updateResults` after processing all lines.
+let globalScope = {};
+
+// `undoStack`: An array storing snapshots of the editor's content.
+// Each time the editor's content changes, the new content is pushed onto this stack.
+// Used by the "Undo" functionality to revert to previous states.
+// It's reset when a new file is loaded or when `clearPage` is called.
+let undoStack = [];
+
+// `currentFileName`: A string storing the name of the file currently loaded into the editor.
+// If no file is loaded (e.g., new session, after "New" button), this is `null`.
+// This variable is managed by `fileManager.js` when files are opened or saved,
+// and reset by `clearPage`. It's crucial for "Save" (overwrite) vs. "Save As" logic.
+let currentFileName = null;
+
+// `defaultInitialContent`: A string representing the default content loaded into the editor
+// when the application starts without any saved content or when a "New" operation occurs
+// and no prior content needs to be loaded from autosave.
+// Exported for use in `fileManager.js` to help determine if content is "unsaved".
+const defaultInitialContent = 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
 
 // **Update Results Function**
 // This function is core to the application's reactivity. It is called whenever the editor content
@@ -113,18 +137,34 @@ const debouncedUpdate = debounce(() => {
 }, 300); // 300ms delay is a common choice for debouncing input.
 
 // **Clear Page Function**
-// Resets the editor and application state to a clean slate.
-// This is typically called when the "New" button is clicked.
+/**
+ * Resets the editor and application state to a clean, empty slate.
+ * This function is typically invoked when the "New" button is clicked (via `fileManager.js`).
+ * It performs the following actions:
+ * - Clears the editor's text content.
+ * - Clears the results display area.
+ * - Resets the `undoStack` to an initial empty state.
+ * - Clears the `globalScope` of all user-defined variables.
+ * - Calls `updateResults()` to reflect the cleared state in the UI (results should show '-').
+ * - Calls `updateLineNumbers()` to reset line numbers.
+ * - Removes the 'calcedit_content' item from `localStorage`, effectively clearing any autosaved work.
+ * - Resets `currentFileName` to `null`, indicating no file is currently open.
+ * - Calls `updateVariableToolbar()` to remove any variable buttons from the toolbar.
+ */
 function clearPage() {
   editor.value = ''; // Clear the editor textarea.
   resultsDiv.innerHTML = ''; // Clear the results display.
-  undoStack = ['']; // Reset the undo stack with a single empty state.
+  // Reset the undo stack; an empty string represents the cleared editor state.
+  undoStack = [''];
   globalScope = {}; // Clear all user-defined variables.
-  updateResults(); // Update the display (should show '-' for results due to empty lines).
-  updateLineNumbers(); // Also update line numbers on clear
-  localStorage.removeItem('calcedit_content'); // Remove any autosaved content from localStorage.
-  currentFileName = null; // Reset the current file name as there's no file loaded.
-  updateVariableToolbar(); // Clear the variable toolbar.
+  updateResults(); // Update UI to reflect the cleared state.
+  updateLineNumbers(); // Reset line numbers for the empty editor.
+  // Remove the autosaved content. If the user starts typing again,
+  // debouncedUpdate will create a new 'calcedit_content'.
+  localStorage.removeItem('calcedit_content');
+  // Reset the current file name state, as no file is "open" anymore.
+  currentFileName = null;
+  updateVariableToolbar(); // Clear variable buttons as globalScope is now empty.
 }
 
 // **Initialize Editor UI Function**
@@ -134,8 +174,8 @@ function initializeEditorUI() {
   // **Initialize Editor Content**
   // Attempt to load content that was previously autosaved to localStorage.
   const savedContent = localStorage.getItem('calcedit_content');
-  // If saved content exists, use it; otherwise, use a default example string.
-  editor.value = savedContent || 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2'; // Note: 'foo l' might be a typo, 'foo' or 'foo+0' works.
+  // If saved content exists, use it; otherwise, use the default initial content.
+  editor.value = savedContent || defaultInitialContent;
   // Initialize the undo stack with the initial content (either saved or default).
   undoStack = [editor.value];
   updateResults(); // Perform an initial calculation and display of results.
@@ -202,4 +242,5 @@ function updateVariableToolbar() {
 // `currentFileName` and `globalScope` are exported directly but their modification logic
 // is primarily within this file or via functions like `clearPage` and `updateResults`.
 // `undoStack` is also exported for `fileManager.js` to reset when loading a file.
-export { editor, resultsDiv, clearPage, updateResults, debouncedUpdate, initializeEditorUI, globalScope, currentFileName, undoStack, updateVariableToolbar };
+// `defaultInitialContent` is exported for `fileManager.js` to use in unsaved changes checks.
+export { editor, resultsDiv, clearPage, updateResults, debouncedUpdate, initializeEditorUI, globalScope, currentFileName, undoStack, updateVariableToolbar, defaultInitialContent };

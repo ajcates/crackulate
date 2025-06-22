@@ -152,12 +152,12 @@
       display: flex;
       align-items: center;
       margin: var(--half-padding) 0;
-      padding: 0;
+      padding: 0 var(--left-margin); /* Add padding to the ul itself for overall spacing */
     }
 
     header li {
       list-style: none;
-      margin-right: var(--left-margin);
+      /* margin-right will be handled by button margin now */
       color: var(--text-primary);
       font-size: var(--font-size);
     }
@@ -166,6 +166,7 @@
       background-color: var(--primary);
       border-radius: var(--border-radius); /* Rounded corners */
       background: linear-gradient(180deg, var(--primary),var(--primary-dark)); /* Subtle gradient */
+      margin-right: var(--half-padding); /* Add margin to separate buttons */
       text-shadow: 0px -1px 0px rgba(255,255,255, 0.3); /* Subtle text shadow */
       box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1); /* Subtle inset shadow */
       border: 1px solid var(--outline);
@@ -221,126 +222,87 @@
       padding: var(--padding);
       border-bottom: 1px solid var(--outline);
     }
+    .modal-header {
+      /*padding: var(--padding); Already defined */
+      /*border-bottom: 1px solid var(--outline); Already defined */
+      display: flex; /* Use flex for header items */
+      justify-content: space-between; /* Space out title and close button */
+      align-items: center; /* Align items vertically */
+    }
     .modal-header h2 {
       margin: 0;
       color: var(--text-primary);
       font-size: calc(var(--font-size) * 1.25); /* 20px */
+      /* width: 100%; -- No longer needed due to flex */
+      /* text-align: center; -- No longer needed due to flex */
     }
     .modal-content {
       background: var(--surface);
       border: 1px solid var(--outline);
-      padding: calc(var(--padding) * 2);
-      max-width: 400px;
-      margin: auto; /* Center modal */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-      border-radius: var(--border-radius); /* Rounded corners */
+      padding: var(--padding); /* Consistent padding */
+      margin: 10vh auto; /* Centered with more top margin */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Softer, deeper shadow */
+      border-radius: var(--border-radius);
+      width: 90%;
+      max-width: 500px; /* Max width for the modal */
+      display: flex;
+      flex-direction: column;
+      align-items: stretch; /* Make children like header/body take full width */
     }
-    .modal-content ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      width: 100%;
+    .modal-body {
+      width: 100%; /* Takes full width from modal-content */
+      padding: var(--padding) 0; /* Vertical padding, horizontal handled by list if needed */
+      margin-top: 0; /* Remove previous margin-top as padding is adjusted */
     }
-    .modal-content li {
-      padding: var(--half-padding) var(--padding);
-      cursor: pointer;
-      color: var(--text-primary);
-      transition: background-color 0.3s ease; /* Smooth hover effect */
-    }
-    .modal-content li:hover {
-      background: var(--outline); /* Change background on hover */
-    }
-    .modal-content li:focus {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
-    }
-    .modal-content li:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
-    }
-    .modal-content li:focus-visible {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
-    }
-    .modal-content li:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
-    }
-    .close {
-      background: none;
-      border: none;
-      color: var(--text-primary);
-      font-size: 20px;
-      cursor: pointer;
-      position: absolute;
-      top: var(--padding);
-      right: var(--padding);
-    }
-    .close:hover {
-      color: var(--primary);
-    }
-    .close:focus {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
-    }
-    .close:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
-    }
-    .close:focus-visible {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
-    }
-    .close:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
-    }
-    /* File list styling */
-
+    /* Styles for .file-list (which is ul#file-list in HTML) */
     .file-list {
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 300px; /* Limit height for scrolling */
-      overflow-y: auto; /* Enable vertical scrolling */
+      width: 100%;
+      max-height: 300px;
+      overflow-y: auto;
       background-color: var(--surface);
       border: 1px solid var(--outline);
-      border-radius: var(--border-radius); /* Rounded corners */
-    }
-
-    .file-list h3 {
-      margin: 0;
-      padding: var(--half-padding) var(--padding);
-      color: var(--text-primary);
-      font-size: calc(var(--font-size) * 1.25); /* 20px */
-      border-bottom: 1px solid var(--outline);
-    }
-    .file-list ul {
-      padding: 0;
-      margin: 0;
-      list-style: none;
+      border-radius: var(--border-radius);
     }
     .file-list li {
-      padding: var(--half-padding) var(--padding);
+      padding: var(--padding);
       cursor: pointer;
       color: var(--text-primary);
-      transition: background-color 0.3s ease; /* Smooth hover effect */
+      transition: background-color 0.3s ease, color 0.3s ease; /* Added color transition */
+      border-bottom: 1px solid var(--outline);
     }
-    .file-list li:hover {
-      background: var(--outline); /* Change background on hover */
+    .file-list li:last-child {
+      border-bottom: none;
+    }
+    .file-list li:hover,
+    .file-list li:focus-visible { /* Combined hover and focus-visible */
+      background-color: var(--primary); /* Use primary color for background */
+      color: var(--background); /* Contrasting text color */
     }
     .file-list li:focus {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
+      outline: none; /* Remove default outline, rely on background change for focus */
     }
 
-    .file-list li:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
+    /* Styling for the .close button in the modal header */
+    .close {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: calc(var(--font-size) * 1.75); /* Larger close icon */
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0 var(--half-padding); /* Minimal padding */
+      line-height: 1; /* Align X nicely */
     }
-
-    .file-list li:focus-visible {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
+    .close:hover,
+    .close:focus-visible {
+      color: var(--primary); /* Highlight on hover/focus */
+      outline: none;
     }
-    .file-list li:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
-    }
+    /* Remove duplicated/old .file-list styling blocks if any were missed by previous cleanup */
+    /* The .file-list styling block that included h3 and ul children was for a different structure */
 
     .hidden {
       display: none;
