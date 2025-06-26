@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lexer Debug</title>
+</head>
+<body>
+    <h1>Lexer Debug</h1>
+    <input type="text" id="test-input" placeholder="Type here to test lexer">
+    <button onclick="testLexer()">Test</button>
+    <div id="output"></div>
+
+    <script type="module">
+        import { lexer } from './js/lexerParser.js';
+        
+        window.testLexer = function() {
+            const input = document.getElementById('test-input').value;
+            const output = document.getElementById('output');
+            
+            try {
+                console.log('Testing input:', input);
+                const tokens = lexer(input);
+                console.log('Tokens:', tokens);
+                output.innerHTML = '<pre>' + JSON.stringify(tokens, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('Error:', error);
+                output.innerHTML = '<span style="color: red;">Error: ' + error.message + '</span>';
+            }
+        };
+        
+        // Auto-test problematic inputs
+        setTimeout(() => {
+            console.log('Testing .3');
+            window.testLexer('.3');
+        }, 1000);
+    </script>
+</body>
+</html>

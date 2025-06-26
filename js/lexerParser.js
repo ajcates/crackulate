@@ -52,8 +52,14 @@ const TokenTypes = {
 function lexer(input) {
   const tokens = []; // Array to store the generated tokens.
   let i = 0; // Current position in the input string.
+  let loopCount = 0; // Protection against infinite loops
+  const maxLoops = input.length * 10; // Reasonable upper bound
 
   while (i < input.length) {
+    loopCount++;
+    if (loopCount > maxLoops) {
+      throw new Error('Lexer infinite loop detected');
+    }
     let char = input[i];
 
     // Skip whitespace characters.
@@ -78,7 +84,7 @@ function lexer(input) {
     // Tokenize Numbers (integers and decimals)
     if (/[0-9]/.test(char) || char === '.') {
       let num = '';
-      let hasDecimal = char === '.';
+      let hasDecimal = false;
       while (i < input.length && (/[0-9]/.test(input[i]) || (input[i] === '.' && !hasDecimal))) {
         if (input[i] === '.') hasDecimal = true;
         num += input[i];
