@@ -4,7 +4,8 @@
   "description": "a mobile crackulator",
   "main": "index.js",
   "scripts": {
-    "test": "live-server &"
+    "dev": "live-server --port=8080 --host=localhost --open=/",
+    "test": "live-server --port=8080 --host=localhost --no-browser"
   },
   "author": "",
   "license": "ISC",

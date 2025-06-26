@@ -33,110 +33,119 @@
  * */
 
     :root {
-      --background: #121212;
-      --surface: #1E1E1E;
-      --text-primary: #E0E0E0;
-      --primary: lawngreen;
-      --accent: deeppink;
-      --outline: #3C3C3C;
-      --font-size: 16px; /* 16px */
-      --line-height: 1.5;
-      --padding: 1em; /* 16px */
-      --half-padding: 0.5em; /* 8px */
-      --left-margin: 1em; /* 16px */
-      --right-margin: 1em; /* 16px */
+      /* === COLOR SYSTEM === */
+      /* Dark theme colors optimized for long coding sessions */
+      --background: #121212;        /* Deep background reduces eye strain */
+      --surface: #1E1E1E;          /* Slightly lighter for component backgrounds */
+      --text-primary: #E0E0E0;     /* High contrast text for readability */
+      --primary: lawngreen;         /* Bright accent for success states and highlights */
+      --accent: deeppink;          /* Secondary accent for variable buttons */
+      --outline: #3C3C3C;          /* Subtle borders that don't compete with content */
+
+      /* === TYPOGRAPHY SYSTEM === */
+      /* Consistent font sizing using rem for scalability */
+      --font-size-base: 16px;      /* Base font size for body text */
+      --font-size-small: 14px;     /* Small text (file names, labels) */
+      --font-size-large: 18px;     /* Large text (headings) */
+      --line-height: 1.5;          /* Optimal for code readability */
+
+      /* === SPACING SYSTEM === */
+      /* Consistent spacing scale for layout harmony */
+      --space-xs: 4px;             /* Tiny spacing (borders, fine adjustments) */
+      --space-sm: 6px;             /* Small spacing (button gaps, compact layouts) */
+      --space-md: 8px;             /* Medium spacing (default padding, margins) */
+      --space-lg: 12px;            /* Large spacing (component padding) */
+      --space-xl: 16px;            /* Extra large spacing (section separation) */
+      --space-xxl: 20px;           /* Maximum spacing (modal padding) */
+
+      /* === SIZING SYSTEM === */
+      /* Touch-friendly sizes following mobile design guidelines */
+      --touch-target-sm: 40px;     /* Minimum touch target for compact UI */
+      --touch-target-md: 44px;     /* Standard touch target (Apple/Google guidelines) */
+      --touch-target-lg: 48px;     /* Large touch target for important actions */
+
+      /* === LAYOUT DIMENSIONS === */
+      /* Specific measurements for layout components */
+      --header-height: 52px;       /* Fixed header height for layout calculations */
+      --toolbar-height: 60px;      /* Variable toolbar height at bottom */
+      --line-numbers-width: 40px;  /* Fixed width for line number column */
+      --results-width: 120px;      /* Fixed width for results column */
+      --modal-max-width: 400px;    /* Maximum modal width for mobile */
+
+      /* === BORDER RADIUS === */
+      /* Consistent corner rounding for modern appearance */
+      --radius-sm: 4px;            /* Small radius for subtle rounding */
+      --radius-md: 6px;            /* Medium radius for buttons and inputs */
+      --radius-lg: 8px;            /* Large radius for modals and cards */
+
+      /* === Z-INDEX SYSTEM === */
+      /* Layering system to prevent conflicts */
+      --z-header: 100;             /* Fixed header layer */
+      --z-toolbar: 100;            /* Variable toolbar layer */
+      --z-modal: 2000;             /* Modal overlay layer */
+      --z-notification: 3000;      /* Notification layer (highest) */
+
+      /* === ADDITIONAL DESIGN TOKENS === */
+      /* Extended color palette and design properties */
+      --primary-dark: color-mix(in hsl, var(--primary), #000000 30%); /* Darker primary for gradients */
+      --accent-dark: crimson;          /* Darker accent for depth */
+      
+      /* === TYPOGRAPHY PROPERTIES === */
+      /* Font properties for consistent text rendering */
+      --font-family: 'Roboto Mono', monospace; /* Monospace for code alignment */
+      --font-weight: 400;              /* Regular weight for body text */
+      --font-style: normal;            /* Standard font style */
+      --text-decoration: none;         /* Clean text without underlines */
+      --text-transform: none;          /* No case transformation */
+      --text-align: left;              /* Left-aligned text for readability */
+      --text-shadow: none;             /* Clean text without shadows */
+
+      /* === ANIMATION & TRANSITIONS === */
+      /* Smooth interactions without being distracting */
+      --transition-fast: all 0.2s ease;     /* Quick transitions for hover states */
+      --transition-normal: all 0.3s ease;   /* Standard transitions for most interactions */
+      
+      /* === SHADOWS & DEPTH === */
+      /* Subtle depth for component hierarchy */
+      --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.1);    /* Light shadow for buttons */
+      --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.3);   /* Medium shadow for modals */
+      --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.5);  /* Strong shadow for overlays */
     }
 
-    /* General styling */
+    /* === RESET & BASE STYLES === */
+    /* Consistent foundation for all elements */
     * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      box-sizing: border-box;  /* Predictable sizing calculations */
+      margin: 0;               /* Remove default margins */
+      padding: 0;              /* Remove default padding */
     }
-    :root {
-      --font-size: 16px; /* 16px */
-      --line-height: 1.5;
-      --padding: 1em; /* 16px */
-      --half-padding: 0.5em; /* 8px */
-      --left-margin: 1em; /* 16px */
-      --right-margin: 1em; /* 16px */
-      --background: #121212;
-      --surface: #1E1E1E;
-      --text-primary: #E0E0E0;
-
-
-      /*radiocactice aqua colot*/
-      --primary-dark: color-mix(in hsl, var(--primary), #000000 30%);
-      --accent-dark: crimson;
-      --outline: #3C3C3C;
-      --font-family: 'Roboto Mono', monospace;
-      --font-weight: 400;
-      --font-style: normal;
-      --text-decoration: none;
-      --text-transform: none;
-      --text-align: left;
-      --text-shadow: none;
-      --border-radius: 4px; /* 4px */
-      --transition: all 0.3s ease; /* Smooth transitions */
-      --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-      --max-width: 1200px; /* Max width for content */
-      --max-height: 100vh; /* Max height for content */
-      --scrollbar-width: 8px; /* Width of the scrollbar */
-      --scrollbar-color: #3C3C3C; /* Color of the scrollbar */
-      --scrollbar-thumb-color: #BB86FC; /* Color of the scrollbar thumb */
-      --scrollbar-thumb-hover-color: #9B59B6; /* Color of the scrollbar thumb on hover */
-      --scrollbar-track-color: #1E1E1E; /* Color of the scrollbar track */
-      --scrollbar-track-hover-color: #2C2C2C; /* Color of the scrollbar track on hover */
-      --scrollbar-thumb-border-radius: 4px; /* Border radius for the scrollbar thumb */
-      --scrollbar-track-border-radius: 4px; /* Border radius for the scrollbar track */
-      --scrollbar-thumb-border: 1px solid rgba(255, 255, 255, 0.2); /* Border for the scrollbar thumb */
-      --scrollbar-track-border: 1px solid rgba(255, 255, 255, 0.1); /* Border for the scrollbar track */
-      --scrollbar-thumb-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); /* Box shadow for the scrollbar thumb */
-      --scrollbar-track-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); /* Box shadow for the scrollbar track */
-      --scrollbar-thumb-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar thumb */
-      --scrollbar-track-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar track */
-      --scrollbar-thumb-hover-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar thumb on hover */
-      --scrollbar-track-hover-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar track on hover */
-      --scrollbar-thumb-active-color: #8E44AD; /* Color of the scrollbar thumb when active */
-      --scrollbar-track-active-color: #2C3E50; /* Color of the scrollbar track when active */
-      --scrollbar-thumb-active-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar thumb when active */
-      --scrollbar-track-active-transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for scrollbar track when active */
-      --scrollbar-thumb-active-border: 1px solid rgba(255, 255, 255, 0.3); /* Border for the scrollbar thumb when active */
-      --scrollbar-track-active-border: 1px solid rgba(255, 255, 255, 0.2); /* Border for the scrollbar track when active */
-      --scrollbar-thumb-active-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.7); /* Box shadow for the scrollbar thumb when active */
-    }
+    /* === HTML ROOT SETUP === */
     html {
-      font-size: 16px; /* 16px */
-      scroll-behavior: smooth;
+      font-size: var(--font-size-base);  /* Base font size for rem calculations */
+      scroll-behavior: smooth;           /* Smooth scrolling for better UX */
+      height: 100%;                      /* Full viewport height */
+      width: 100%;                       /* Full viewport width */
     }
-    /* Body styling */
-    body, html {
-      height: 100%;
-      width: 100%;
-      overflow: hidden; /* Prevents scrolling */
-    }
+    
+    /* === BODY LAYOUT === */
+    /* Main container using flexbox for responsive layout */
     body {
-      background-color: var(--background);
-      color: var(--text-primary);
-      font-family: var(--font-family);
-      font-weight: var(--font-weight);
-      font-style: var(--font-style);
-      text-decoration: var(--text-decoration);
-      text-transform: var(--text-transform);
-      text-align: var(--text-align);
-      text-shadow: var(--text-shadow);
+      height: 100%;                      /* Fill full viewport */
+      width: 100%;                       /* Fill full viewport */
+      background-color: var(--background); /* Dark theme background */
+      color: var(--text-primary);       /* High contrast text */
+      font-family: var(--font-family);  /* Monospace font for code */
+      font-weight: var(--font-weight);  /* Regular font weight */
+      font-style: var(--font-style);    /* Normal font style */
+      text-decoration: var(--text-decoration); /* Clean text */
+      text-transform: var(--text-transform);   /* No case changes */
+      text-align: var(--text-align);    /* Left-aligned text */
+      text-shadow: var(--text-shadow);  /* No text shadows */
     }
 
     /* Header styling */
     header {
-      position: fixed;
-      top: 0;
-      left: 0;
       width: 100%;
-      z-index: 1000; /* Ensure header is above other content */
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       background-color: var(--background);
       color: var(--text-primary);
       font-size: var(--font-size);
@@ -346,69 +355,70 @@
       display: none;
     }
 
-    /* Flex container for side-by-side layout */
+    /* === EDITOR CONTAINER === */
+    /* Three-column layout: Line Numbers | Editor | Results */
     .container {
-      display: flex;
-      height: 100vh; /* Full viewport height */
-      padding-top: calc(var(--padding)*3); /* Space for fixed header */
+      display: flex;                       /* Horizontal three-column layout */
+      height: 100%;                        /* Fill main-content area */
+      overflow: hidden;                    /* Prevent container overflow */
     }
-    /* Side-by-side layout */
+
+    /* === LINE NUMBERS COLUMN === */
+    /* Fixed-width column showing line numbers synchronized with editor */
     .line-numbers {
-      width: 40px; /* Fixed width for line numbers */
-      height: calc(100vh - 60px); /* Full height minus header */
-      background-color: var(--surface);
-      color: var(--text-primary);
-      font-family: var(--font-family);
-      font-size: var(--font-size);
-      line-height: var(--line-height);
-      padding: var(--half-padding);
-      text-align: right;
-      overflow: hidden; /* Prevents its own scrollbar, will sync with editor */
-      user-select: none; /* Prevent text selection */
-      box-sizing: border-box;
-      border-right: 1px solid var(--outline); /* Optional: a separator line */
+      width: var(--line-numbers-width);    /* Fixed width for consistent alignment */
+      height: 100%;                        /* Fill container height */
+      background-color: var(--surface);   /* Subtle background differentiation */
+      color: var(--text-primary);         /* High contrast text */
+      font-family: var(--font-family);    /* Monospace for alignment */
+      font-size: var(--font-size-base);   /* Match editor font size */
+      line-height: var(--line-height);    /* Match editor line height */
+      padding: var(--space-md);           /* Comfortable padding */
+      text-align: right;                  /* Right-align numbers */
+      overflow: hidden;                   /* Sync scroll with editor */
+      user-select: none;                  /* Prevent accidental selection */
+      box-sizing: border-box;             /* Include padding in width */
+      border-right: 1px solid var(--outline); /* Separator from editor */
     }
     
+    /* === MAIN EDITOR === */
+    /* Primary text input area for mathematical expressions */
     .editor {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      height: calc(100vh - 60px); /* Full height minus header */
-      overflow: auto; /* Enable scrolling for the editor itself */
-      background-color: var(--surface);
-      color: var(--text-primary);
-      font-family: var(--font-family);
-      font-size: var(--font-size);
-      line-height: var(--line-height);
-      box-sizing: border-box;
-      flex-wrap: nowrap;
-      flex-grow: 1;
-      /* Adjust flex basis if needed, or rely on width of line-numbers and results */
-      flex: 1; /* Allow editor to take remaining space */
-      padding: var(--half-padding);
-      /* Remove fixed width for editor if line-numbers and results have fixed/flex widths */
-      resize: none; /* Disable textarea resizing */
+      width: 100%;                         /* Take available space */
+      height: 100%;                        /* Fill container height */
+      overflow: auto;                      /* Enable scrolling for long content */
+      background-color: var(--surface);   /* Clean background */
+      color: var(--text-primary);         /* High contrast text */
+      font-family: var(--font-family);    /* Monospace for code alignment */
+      font-size: var(--font-size-base);   /* Readable font size */
+      line-height: var(--line-height);    /* Optimal line spacing */
+      box-sizing: border-box;             /* Include padding in dimensions */
+      flex: 1;                            /* Take remaining space between columns */
+      padding: var(--space-md);          /* Comfortable text padding */
+      resize: none;                       /* Prevent manual resizing */
+      border: none;                       /* Clean appearance */
+      outline: none;                      /* Remove focus outline */
     }
 
+    /* === RESULTS COLUMN === */
+    /* Fixed-width column showing calculation results */
     .results {
-      display: flex;
-      flex-direction: column;
-      /* width: 100%; */ /* Let flexbox determine width */
-      min-width: 100px; /* Minimum width for results pane */
-      height: calc(100vh - 60px); /* Full height minus header */
-      overflow: hidden; /* Prevents scrolling */
-      background-color: var(--surface);
-      color: var(--text-primary);
-      font-family: var(--font-family);
-      font-size: var(--font-size);
-      line-height: var(--line-height);
-      box-sizing: border-box;
-      text-align: right;
-      border-left: 2px solid var(--outline);
-      padding: var(--half-padding);
-      scroll-behavior: smooth;      
-      flex: 0 0 120px; /* Don't grow, don't shrink, basis of 120px */
-
+      display: flex;                      /* Vertical stacking of results */
+      flex-direction: column;             /* Stack results vertically */
+      min-width: 100px;                   /* Minimum readable width */
+      height: 100%;                       /* Fill container height */
+      overflow: hidden;                   /* Prevent independent scrolling */
+      background-color: var(--surface);  /* Match editor background */
+      color: var(--text-primary);        /* High contrast text */
+      font-family: var(--font-family);   /* Monospace for alignment */
+      font-size: var(--font-size-base);  /* Match editor font size */
+      line-height: var(--line-height);   /* Match editor line height */
+      box-sizing: border-box;             /* Include padding in width */
+      text-align: right;                  /* Right-align results */
+      border-left: 2px solid var(--outline); /* Separator from editor */
+      padding: var(--space-md);          /* Match editor padding */
+      scroll-behavior: smooth;            /* Smooth scrolling when synced */
+      flex: 0 0 var(--results-width);    /* Fixed width, no grow/shrink */
     }
     /* Results pane on the right */
 	
@@ -418,43 +428,451 @@
       padding: 0;
     }
 
+/* === VARIABLE TOOLBAR === */
+/* Fixed bottom toolbar that adapts to mobile keyboard visibility */
 #variable-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  position: fixed;
-  bottom: 0;
+  display: flex;                       /* Horizontal button layout */
+  flex-wrap: wrap;                     /* Wrap buttons to multiple lines if needed */
+  position: fixed;                     /* Fixed positioning for always-visible access */
+  bottom: 0;                           /* Default: stick to bottom edge */
+  left: 0;                            /* Full width alignment */
+  width: 100%;                         /* Full viewport width */
+  padding: var(--space-md);           /* Comfortable padding around buttons */
+  /* Temporary debugging - make toolbar more visible */
+  background-color: #2a2a2a;          /* Darker background for visibility */
+  border-top: 2px solid var(--primary); /* Bright border for debugging */
+  box-sizing: border-box;              /* Include padding in total width */
+  z-index: var(--z-toolbar);          /* Above main content, below modals */
+  height: var(--toolbar-height);      /* Fixed height for layout calculations */
+  
+  /* Additional mobile-specific adjustments */
+  transform: translateZ(0);            /* Force hardware acceleration */
+  will-change: transform;              /* Optimize for position changes */
+}
+
+/* === MOBILE KEYBOARD STATES === */
+/* Adaptive positioning when mobile keyboard is visible */
+
+/* When keyboard is visible, use alternative positioning */
+.keyboard-visible #variable-toolbar {
+  position: fixed;                     /* Maintain fixed positioning */
+  bottom: 0;                          /* Stay at actual bottom */
+  transform: translateY(-100%);       /* Move above keyboard area */
+}
+
+/* === MOBILE VIEWPORT OPTIMIZATION === */
+/* Improved mobile experience with proper viewport units */
+@media screen and (max-width: 768px) {
+  #variable-toolbar {
+    /* Smooth transitions when keyboard appears/disappears */
+    transition: transform 0.3s ease-out;
+    /* Reduce toolbar height on mobile for more screen space */
+    height: calc(var(--toolbar-height) * 0.8); /* 20% smaller on mobile */
+    padding: var(--space-sm);          /* Tighter padding on mobile */
+  }
+}
+
+/* Support for browsers with Visual Viewport API */
+@supports (height: 100dvh) {
+  .main-content {
+    padding-bottom: var(--toolbar-height); /* Account for toolbar */
+    height: calc(100dvh - var(--header-height) - var(--toolbar-height)); /* Dynamic height */
+  }
+}
+
+/* === VARIABLE BUTTONS === */
+/* Dynamic buttons for each user-defined variable */
+#variable-toolbar button {
+  color: var(--text-primary);         /* High contrast text */
+  background: linear-gradient(180deg, var(--accent), var(--accent-dark)); /* Distinctive gradient */
+  border: 1px solid var(--outline);   /* Subtle border */
+  padding: var(--space-md) var(--space-xl); /* Pill-shaped padding */
+  cursor: pointer;                     /* Indicate interactive element */
+  margin-right: var(--space-md);      /* Space between buttons */
+  margin-bottom: var(--space-md);     /* Space for wrapped rows */
+  border-radius: 20px;                /* Pill shape for variable distinction */
+  font-family: var(--font-family);    /* Consistent monospace font */
+  font-size: var(--font-size-small);  /* Compact text size */
+  transition: var(--transition-fast);  /* Quick hover response */
+  white-space: nowrap;                 /* Prevent text wrapping */
+}
+
+/* === VARIABLE BUTTON INTERACTION === */
+#variable-toolbar button:hover {
+  opacity: 0.8;                        /* Subtle transparency on hover */
+}
+
+/* === PAGE LAYOUT SYSTEM === */
+/* Flexbox layout: Header -> Main Content -> Fixed Variable Toolbar */
+body {
+  display: flex;                       /* Flexbox container */
+  flex-direction: column;              /* Vertical stack layout */
+  height: 100vh;                       /* Full viewport height */
+  overflow: hidden;                    /* Prevent page scrolling */
+}
+
+/* === HEADER LAYOUT === */
+header {
+  flex-shrink: 0;                      /* Prevent header compression */
+}
+
+/* === MAIN CONTENT AREA === */
+/* Editor area that fills space between header and bottom toolbar */
+.main-content {
+  flex: 1;                             /* Take remaining space */
+  overflow: hidden;                    /* Prevent content overflow */
+  padding-bottom: var(--toolbar-height); /* Space for fixed variable toolbar */
+}
+
+/* === FILE OPERATIONS TOOLBAR === */
+/* Compact mobile-first toolbar for file operations */
+.mobile-toolbar {
+  background-color: var(--background); /* Match page background */
+  border-bottom: 1px solid var(--outline); /* Subtle separator */
+  padding: var(--space-sm) var(--space-md); /* Compact but touch-friendly */
+  height: var(--header-height);        /* Fixed height for calculations */
+}
+
+/* === TOOLBAR LAYOUT === */
+/* Horizontal layout with file actions on left, status on right */
+.toolbar-row {
+  display: flex;                       /* Horizontal layout */
+  justify-content: space-between;      /* Spread items apart */
+  align-items: center;                 /* Vertical center alignment */
+  max-width: 100%;                     /* Prevent overflow */
+  height: 100%;                        /* Fill toolbar height */
+}
+
+/* === FILE ACTION BUTTONS === */
+/* Container for New, Open, Save, Undo buttons */
+.file-actions {
+  display: flex;                       /* Horizontal button row */
+  gap: var(--space-sm);                /* Compact spacing between buttons */
+}
+
+/* === FILE STATUS DISPLAY === */
+/* Shows current file name and save status indicator */
+.file-status {
+  display: flex;                       /* Horizontal layout */
+  align-items: center;                 /* Vertical center alignment */
+  gap: var(--space-sm);                /* Small gap between name and indicator */
+  font-size: var(--font-size-small);  /* Smaller text for status */
+  color: var(--text-primary);         /* Standard text color */
+  flex: 1;                             /* Take remaining space */
+  justify-content: flex-end;           /* Right-align content */
+  overflow: hidden;                    /* Handle long file names */
+}
+
+#current-file-name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+#current-file-name.has-file {
+  color: var(--primary);
+}
+
+#current-file-name.no-file {
+  color: #888;
+  font-style: italic;
+}
+
+.save-indicator {
+  color: #ff6b6b;
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* === MOBILE FILE OPERATION BUTTONS === */
+/* Compact touch-friendly buttons for file operations */
+.btn-mobile {
+  background: var(--surface);             /* Elevated surface color */
+  border: 1px solid var(--outline);      /* Subtle border */
+  border-radius: var(--radius-md);       /* Consistent corner rounding */
+  padding: var(--space-lg);              /* Touch-friendly padding */
+  font-size: var(--font-size-base);      /* Standard icon size */
+  cursor: pointer;                       /* Indicate interactive element */
+  color: var(--text-primary);           /* High contrast text/icons */
+  transition: var(--transition-fast);    /* Quick hover response */
+  min-width: var(--touch-target-sm);     /* Minimum touch target size */
+  min-height: var(--touch-target-sm);    /* Minimum touch target size */
+  display: flex;                         /* Center icon content */
+  align-items: center;                   /* Vertical centering */
+  justify-content: center;               /* Horizontal centering */
+}
+
+/* === BUTTON INTERACTION STATES === */
+.btn-mobile:hover, .btn-mobile:active {
+  background: var(--outline);            /* Subtle highlight on interaction */
+}
+
+.btn-mobile:focus {
+  outline: 2px solid var(--primary);     /* Clear focus indicator */
+  outline-offset: 2px;                   /* Space around focus ring */
+}
+
+/* === MODAL SYSTEM === */
+/* Overlay system for file operations and confirmations */
+
+/* === MODAL OVERLAY === */
+/* Full-screen backdrop for modal dialogs */
+.modal-overlay {
+  position: fixed;                      /* Fixed positioning over everything */
+  top: 0;                              /* Cover entire viewport */
   left: 0;
   width: 100%;
-  padding: var(--half-padding);
-  background-color: var(--surface);
-  border-top: 1px solid var(--outline);
-  box-sizing: border-box;
-  z-index: 100; /* Ensure it's above other content */
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);      /* Semi-transparent dark backdrop */
+  display: flex;                       /* Center modal content */
+  align-items: flex-start;             /* Align to top for mobile */
+  justify-content: center;             /* Center horizontally */
+  z-index: var(--z-modal);            /* Above all other content */
+  padding: var(--space-xxl);          /* Breathing room around modal */
+  box-sizing: border-box;              /* Include padding in size */
 }
 
-#variable-toolbar button {
-  color: var(--text-primary);
-  background: linear-gradient(180deg, var(--accent),var(--accent-dark)); /* Subtle gradient */
+.modal-overlay.hidden {
+  display: none;                       /* Hide when not active */
+}
+
+/* === MODAL CONTAINER === */
+/* Main modal box with mobile-first responsive design */
+.mobile-modal {
+  background: var(--surface);          /* Elevated surface background */
+  border-radius: var(--radius-lg);     /* Rounded corners for modern look */
+  width: 100%;                         /* Full width on small screens */
+  max-width: var(--modal-max-width);   /* Limit width on larger screens */
+  margin-top: var(--toolbar-height);   /* Space below header */
+  box-shadow: var(--shadow-strong);    /* Strong shadow for depth */
+  animation: slideDown var(--transition-normal) ease; /* Smooth entrance */
+}
+
+.mobile-modal.small {
+  max-width: 320px;                    /* Smaller width for confirmations */
+}
+
+/* === MODAL ANIMATION === */
+/* Smooth slide-down entrance animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;                        /* Start invisible */
+    transform: translateY(-30px);      /* Start above final position */
+  }
+  to {
+    opacity: 1;                        /* End fully visible */
+    transform: translateY(0);          /* End at final position */
+  }
+}
+
+/* === MODAL HEADER === */
+/* Title bar with close button */
+.modal-header {
+  display: flex;                       /* Horizontal layout */
+  justify-content: space-between;      /* Title left, close right */
+  align-items: center;                 /* Vertical center alignment */
+  padding: var(--space-xl);           /* Generous padding for touch */
+  border-bottom: 1px solid var(--outline); /* Separator from content */
+  background: var(--background);       /* Contrasting header background */
+}
+
+.modal-header h2, .modal-header h3 {
+  margin: 0;                           /* Remove default margins */
+  color: var(--text-primary);         /* High contrast text */
+  font-size: var(--font-size-base);   /* Standard readable size */
+  font-weight: 500;                    /* Medium weight for emphasis */
+}
+
+/* === MODAL CLOSE BUTTON === */
+/* Touch-friendly close button */
+.modal-close {
+  background: none;                    /* Transparent background */
+  border: none;                        /* No border */
+  color: var(--text-primary);         /* Standard text color */
+  font-size: var(--font-size-large);  /* Large for easy tapping */
+  cursor: pointer;                     /* Indicate interactive */
+  padding: var(--space-md);           /* Touch-friendly padding */
+  border-radius: var(--radius-sm);    /* Subtle corner rounding */
+  min-width: var(--touch-target-sm);  /* Minimum touch target */
+  min-height: var(--touch-target-sm); /* Minimum touch target */
+  display: flex;                       /* Center icon */
+  align-items: center;                 /* Vertical centering */
+  justify-content: center;             /* Horizontal centering */
+  transition: var(--transition-fast);  /* Quick hover response */
+}
+
+.modal-close:hover, .modal-close:active {
+  background: var(--outline);          /* Subtle highlight on interaction */
+}
+
+/* === MODAL CONTENT === */
+/* Main content area of modal */
+.modal-content {
+  padding: var(--space-xl);           /* Generous padding for readability */
+}
+
+/* Simple File List */
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.file-list li {
+  margin-bottom: 8px;
+}
+
+.file-button {
+  width: 100%;
+  background: var(--background);
   border: 1px solid var(--outline);
-  padding: var(--half-padding) var(--padding);
+  border-radius: 6px;
+  padding: 16px 12px;
   cursor: pointer;
-  margin-right: var(--half-padding);
-  margin-bottom: var(--half-padding);
-  /* pill like shape with random corners */
-  border-radius: 20px; /* Rounded corners */
-  
+  color: var(--text-primary);
+  text-align: left;
+  font-size: 14px;
+  font-family: var(--font-family);
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
 }
 
-#variable-toolbar button:hover {
-opacity: 0.8;
+.file-button:hover, .file-button:active {
+  background: var(--outline);
 }
 
-/*suggestions for the style of the crackulator:
- * * it should have a dark theme
- * * it should have a modern look
- * * it 
- *
- * 
-*/
+.file-button.delete-mode {
+  border-color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.file-icon {
+  font-size: 16px;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* Simple Save Form */
+.mobile-input {
+  width: 100%;
+  padding: 16px 12px;
+  background: var(--background);
+  border: 1px solid var(--outline);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 16px;
+  margin-bottom: 16px;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.mobile-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 6px;
+  padding: 12px 20px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 44px;
+  min-width: 80px;
+  transition: background-color 0.2s ease;
+}
+
+.action-btn:hover, .action-btn:active {
+  background: var(--outline);
+}
+
+.save-btn, .confirm-btn {
+  background: var(--primary);
+  color: black;
+  border-color: var(--primary);
+}
+
+.delete-btn {
+  color: #f44336;
+  border-color: #f44336;
+}
+
+.cancel-btn {
+  color: #888;
+}
+
+/* Simple Notifications */
+.notification {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  background: var(--surface);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 3000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  max-width: 280px;
+  text-align: center;
+}
+
+.notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.notification-success {
+  border: 1px solid #4CAF50;
+}
+
+.notification-error {
+  border: 1px solid #f44336;
+}
+
+/* Body modal state */
+body.modal-open {
+  overflow: hidden;
+}
 
 
