@@ -13,6 +13,9 @@
 // The `evaluate` function takes the AST node, the current variable scope, an array of
 // results from previous lines (for line references), and the current line number as input.
 
+// Access Decimal from global scope (loaded via CDN)
+const Decimal = window.Decimal;
+
 // **Evaluator Function**
 // Takes an Abstract Syntax Tree (AST) node, a scope object (for variable storage),
 // an array of line results (for line references), and the current line index.
@@ -21,8 +24,8 @@ function evaluate(ast, scope, lineResults, currentLine) {
   // Base case: if the AST node is null or undefined (e.g., from an empty expression), return null.
   if (!ast) return null;
 
-  // Handle number literals: return their value directly.
-  if (ast.type === 'number') return ast.value;
+  // Handle number literals: return their value as a Decimal for precise arithmetic.
+  if (ast.type === 'number') return new Decimal(ast.value);
 
   // Handle variables: look up the variable name in the current scope.
   if (ast.type === 'variable') {
@@ -48,8 +51,8 @@ function evaluate(ast, scope, lineResults, currentLine) {
     if (refValue === 'e') {
       throw new Error(`Cannot reference an error: #${ast.line}`);
     }
-    // Convert the referenced result (which might be a string) to a floating-point number.
-    return parseFloat(refValue);
+    // Convert the referenced result (which might be a string) to a Decimal for precise arithmetic.
+    return new Decimal(refValue);
   }
 
   // Handle binary operations (e.g., addition, subtraction).
@@ -57,15 +60,15 @@ function evaluate(ast, scope, lineResults, currentLine) {
     // Recursively evaluate the left and right operands of the binary expression.
     const left = evaluate(ast.left, scope, lineResults, currentLine);
     const right = evaluate(ast.right, scope, lineResults, currentLine);
-    // Perform the operation based on the operator type.
+    // Perform the operation based on the operator type using Decimal arithmetic.
     switch (ast.operator) {
-      case '+': return left + right;
-      case '-': return left - right;
-      case '*': return left * right;
+      case '+': return left.plus(right);
+      case '-': return left.minus(right);
+      case '*': return left.times(right);
       case '/':
         // Handle division by zero: return NaN (Not a Number).
         // The updateResults function in domUtils.js will typically display this as '0' or handle it.
-        return right === 0 ? NaN : left / right;
+        return right.isZero() ? new Decimal(NaN) : left.dividedBy(right);
       default:
         // If the operator is unknown, it's an error.
         throw new Error(`Unknown operator: ${ast.operator}`);

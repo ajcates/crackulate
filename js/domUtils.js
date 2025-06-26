@@ -12,6 +12,10 @@
 
 import { lexer, Parser } from './lexerParser.js';
 import { evaluate } from './evaluator.js';
+import { storage, getAutosave, saveAutosave, clearAutosave } from './storageUtils.js';
+
+// Access Decimal from global scope (loaded via CDN)
+const Decimal = window.Decimal;
 
 // **DOM Elements and State**
 // These are references to key HTML elements that the script will interact with.
@@ -68,7 +72,14 @@ function updateResults() {
       // Evaluate the AST. Pass the tempScope, results array (for line references), and current line index.
       const result = evaluate(ast, tempScope, results, index);
       // Store the result. If null or NaN (e.g. from division by zero), display '0'.
-      results.push(result === null || isNaN(result) ? '0' : result.toString());
+      // Handle Decimal objects and check for NaN properly
+      if (result === null) {
+        results.push('0');
+      } else if (result.isNaN && result.isNaN()) {
+        results.push('0');
+      } else {
+        results.push(result.toString());
+      }
     } catch (e) {
       console.error(e); // Log the actual error to the console for debugging purposes.
       results.push('e'); // Display 'e' for lines that cause an error.
@@ -109,7 +120,11 @@ function debounce(fn, delay) {
 const debouncedUpdate = debounce(() => {
   updateResults(); // Perform the actual update.
   // Autosave the editor content to localStorage so it can be restored if the page is reloaded.
-  localStorage.setItem('calcedit_content', editor.value);
+  saveAutosave(editor.value);
+  // Notify file manager of content changes for save status updates
+  if (window.fileManager) {
+    window.fileManager.onEditorChange();
+  }
 }, 300); // 300ms delay is a common choice for debouncing input.
 
 // **Clear Page Function**
@@ -122,7 +137,7 @@ function clearPage() {
   globalScope = {}; // Clear all user-defined variables.
   updateResults(); // Update the display (should show '-' for results due to empty lines).
   updateLineNumbers(); // Also update line numbers on clear
-  localStorage.removeItem('calcedit_content'); // Remove any autosaved content from localStorage.
+  clearAutosave(); // Remove any autosaved content from localStorage.
   currentFileName = null; // Reset the current file name as there's no file loaded.
   updateVariableToolbar(); // Clear the variable toolbar.
 }
@@ -133,14 +148,19 @@ function clearPage() {
 function initializeEditorUI() {
   // **Initialize Editor Content**
   // Attempt to load content that was previously autosaved to localStorage.
-  const savedContent = localStorage.getItem('calcedit_content');
+  const savedContent = getAutosave();
   // If saved content exists, use it; otherwise, use a default example string.
-  editor.value = savedContent || 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2'; // Note: 'foo l' might be a typo, 'foo' or 'foo+0' works.
+  editor.value = savedContent || 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
   // Initialize the undo stack with the initial content (either saved or default).
   undoStack = [editor.value];
   updateResults(); // Perform an initial calculation and display of results.
   updateLineNumbers(); // Initialize line numbers
   updateVariableToolbar(); // Populate the variable toolbar based on the initial state.
+  
+  // **Initialize Mobile Keyboard Detection**
+  // Handle variable toolbar positioning when mobile keyboard appears
+  // Temporarily disabled for debugging
+  // initializeMobileKeyboardHandling();
 
   // **Editor Input Event Listener**
   // This listener fires every time the user types in the editor.
@@ -196,6 +216,68 @@ function updateVariableToolbar() {
     });
     variableToolbar.appendChild(button); // Add the new button to the toolbar.
   });
+}
+
+// **Mobile Keyboard Detection Function**
+// Detects when mobile keyboard appears/disappears and adjusts variable toolbar position
+function initializeMobileKeyboardHandling() {
+  // Modern approach using Visual Viewport API (supported on newer mobile browsers)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleViewportResize);
+  }
+  
+  // Fallback approach using window resize detection
+  let initialViewportHeight = window.innerHeight;
+  
+  function handleViewportResize() {
+    const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const heightDifference = initialViewportHeight - currentHeight;
+    
+    // If viewport height decreased significantly (> 150px), keyboard is likely visible
+    const keyboardThreshold = 150;
+    const keyboardVisible = heightDifference > keyboardThreshold;
+    
+    // Toggle keyboard-visible class on body
+    if (keyboardVisible) {
+      document.body.classList.add('keyboard-visible');
+    } else {
+      document.body.classList.remove('keyboard-visible');
+    }
+    
+    // Update toolbar position dynamically
+    const toolbar = document.getElementById('variable-toolbar');
+    if (toolbar) {
+      if (keyboardVisible && window.visualViewport) {
+        // Position toolbar at the top of the visible viewport
+        const keyboardHeight = initialViewportHeight - currentHeight;
+        toolbar.style.bottom = `${keyboardHeight}px`;
+      } else {
+        // Reset to default position
+        toolbar.style.bottom = '';
+      }
+    }
+  }
+  
+  // Legacy fallback for older browsers
+  window.addEventListener('resize', () => {
+    // Use timeout to debounce resize events
+    clearTimeout(window.keyboardResizeTimeout);
+    window.keyboardResizeTimeout = setTimeout(handleViewportResize, 100);
+  });
+  
+  // Additional mobile-specific event listeners
+  if ('ontouchstart' in window) {
+    // Focus events on mobile that might trigger keyboard
+    editor.addEventListener('focus', () => {
+      // Slight delay to allow keyboard animation
+      setTimeout(handleViewportResize, 300);
+    });
+    
+    editor.addEventListener('blur', () => {
+      // Slight delay to allow keyboard animation
+      setTimeout(handleViewportResize, 300);
+    });
+  }
 }
 
 // Export necessary functions and variables for use in other modules (e.g., main.js, fileManager.js).
