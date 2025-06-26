@@ -7,5 +7,15 @@
     "test": "live-server &"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "git-scripts": "^0.6.4",
+    "live-server": "^1.2.0",
+    "surge": "^0.0.0"
+  },
+  "git": {
+    "scripts": {
+      "pre-push": "surge --project ./ --domain crackulator.surge.sh"
+    }
+  }
 }
