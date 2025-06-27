@@ -44,9 +44,9 @@
 
       /* === TYPOGRAPHY SYSTEM === */
       /* Consistent font sizing using rem for scalability */
-      --font-size-base: 16px;      /* Base font size for body text */
-      --font-size-small: 14px;     /* Small text (file names, labels) */
-      --font-size-large: 18px;     /* Large text (headings) */
+      --font-size-base: 14px;      /* Base font size for body text */
+      --font-size-small: 12px;     /* Small text (file names, labels) */
+      --font-size-large: 16px;     /* Large text (headings) */
       --line-height: 1.5;          /* Optimal for code readability */
 
       /* === SPACING SYSTEM === */
@@ -453,11 +453,32 @@
 /* === MOBILE KEYBOARD STATES === */
 /* Adaptive positioning when mobile keyboard is visible */
 
-/* When keyboard is visible, use alternative positioning */
+/* When keyboard is visible, adjust layout for editor usability */
+.keyboard-visible {
+  height: 100vh;                       /* Maintain full viewport height */
+  overflow: hidden;                    /* Prevent body scrolling */
+}
+
+.keyboard-visible header {
+  position: fixed;                     /* Keep header at top */
+  top: 0;                             /* Stick to top of viewport */
+  left: 0;                            /* Full width */
+  right: 0;                           /* Full width */
+  z-index: var(--z-header);          /* Above other content */
+}
+
+.keyboard-visible .main-content {
+  transition: height 0.3s ease-out;   /* Smooth height transitions */
+  overflow: hidden;                    /* Prevent content overflow */
+  margin-top: var(--header-height);   /* Account for fixed header */
+  padding-bottom: 0 !important;       /* Remove default padding to eliminate deadspace */
+}
+
 .keyboard-visible #variable-toolbar {
-  position: fixed;                     /* Maintain fixed positioning */
-  bottom: 0;                          /* Stay at actual bottom */
-  transform: translateY(-100%);       /* Move above keyboard area */
+  position: fixed !important;         /* Force fixed positioning */
+  bottom: 0 !important;               /* Stay at bottom of visible viewport */
+  transition: bottom 0.3s ease-out;   /* Smooth position transitions */
+  z-index: var(--z-toolbar);         /* Ensure toolbar stays above content */
 }
 
 /* === MOBILE VIEWPORT OPTIMIZATION === */
@@ -477,6 +498,13 @@
   .main-content {
     padding-bottom: var(--toolbar-height); /* Account for toolbar */
     height: calc(100dvh - var(--header-height) - var(--toolbar-height)); /* Dynamic height */
+  }
+  
+  /* When keyboard is visible, use smaller dynamic viewport height */
+  .keyboard-visible .main-content {
+    height: calc(100svh - var(--header-height) - var(--toolbar-height)); /* Small viewport height */
+    max-height: calc(100svh - var(--header-height) - var(--toolbar-height));
+    margin-top: var(--header-height); /* Account for fixed header */
   }
 }
 

@@ -159,8 +159,7 @@ function initializeEditorUI() {
   
   // **Initialize Mobile Keyboard Detection**
   // Handle variable toolbar positioning when mobile keyboard appears
-  // Temporarily disabled for debugging
-  // initializeMobileKeyboardHandling();
+  initializeMobileKeyboardHandling();
 
   // **Editor Input Event Listener**
   // This listener fires every time the user types in the editor.
@@ -170,9 +169,10 @@ function initializeEditorUI() {
   });
 
   // **Editor Scroll Event Listener**
-  // Synchronizes the scrolling of the line numbers div with the editor textarea.
+  // Synchronizes the scrolling of the line numbers div and results div with the editor textarea.
   editor.addEventListener('scroll', () => {
     lineNumbersDiv.scrollTop = editor.scrollTop;
+    resultsDiv.scrollTop = editor.scrollTop;
   });
 
   // **Undo Button Event Listener**
@@ -219,7 +219,7 @@ function updateVariableToolbar() {
 }
 
 // **Mobile Keyboard Detection Function**
-// Detects when mobile keyboard appears/disappears and adjusts variable toolbar position
+// Detects when mobile keyboard appears/disappears and adjusts layout for editor usability
 function initializeMobileKeyboardHandling() {
   // Modern approach using Visual Viewport API (supported on newer mobile browsers)
   if (window.visualViewport) {
@@ -244,17 +244,32 @@ function initializeMobileKeyboardHandling() {
       document.body.classList.remove('keyboard-visible');
     }
     
-    // Update toolbar position dynamically
+    // Update layout to accommodate keyboard while keeping header visible
+    const mainContent = document.querySelector('.main-content');
     const toolbar = document.getElementById('variable-toolbar');
-    if (toolbar) {
-      if (keyboardVisible && window.visualViewport) {
-        // Position toolbar at the top of the visible viewport
-        const keyboardHeight = initialViewportHeight - currentHeight;
-        toolbar.style.bottom = `${keyboardHeight}px`;
-      } else {
-        // Reset to default position
-        toolbar.style.bottom = '';
-      }
+    const header = document.querySelector('header');
+    
+    if (keyboardVisible && window.visualViewport) {
+      // Calculate available space for main content more precisely
+      const headerHeight = header.offsetHeight;
+      const toolbarHeight = toolbar.offsetHeight;
+      const availableHeight = window.visualViewport.height - headerHeight - toolbarHeight;
+      
+      // Adjust main content to use all available space
+      mainContent.style.height = `${availableHeight}px`;
+      mainContent.style.maxHeight = `${availableHeight}px`;
+      mainContent.style.paddingBottom = '0px'; // Remove padding when keyboard visible
+      
+      // Keep toolbar at bottom of visible viewport
+      toolbar.style.bottom = '0px';
+      toolbar.style.position = 'fixed';
+    } else {
+      // Reset to default layout
+      mainContent.style.height = '';
+      mainContent.style.maxHeight = '';
+      mainContent.style.paddingBottom = '';
+      toolbar.style.bottom = '';
+      toolbar.style.position = '';
     }
   }
   
