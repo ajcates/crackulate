@@ -195,8 +195,8 @@ function initializeEditorUI() {
 // Clicking a variable button inserts the variable's name into the editor at the current cursor position.
 function updateVariableToolbar() {
   variableToolbar.innerHTML = ''; // Clear any existing buttons from the toolbar.
-  // Get all variable names from globalScope, sort them alphabetically, and create a button for each.
-  Object.keys(globalScope).sort().forEach(varName => {
+  // Get all variable names from globalScope that have defined values, sort them alphabetically, and create a button for each.
+  Object.keys(globalScope).filter(varName => globalScope[varName] !== undefined).sort().forEach(varName => {
     const button = document.createElement('button');
     button.textContent = varName; // Set the button text to the variable name.
     // Add a click event listener to each button.
