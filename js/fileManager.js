@@ -194,6 +194,7 @@ class FileManager {
     }
 
     if (getFile(fileName) !== null && fileName !== domUtils.currentFileName) {
+      this.closeModal(); // Close save modal before showing confirmation
       this.showConfirmation('File Exists', 
         `A file named "${fileName}" already exists. Overwrite it?`, 
         () => this.saveToFile(fileName)
@@ -300,7 +301,23 @@ class FileManager {
     // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
+    
+    // Create close button
+    const closeButton = document.createElement('button');
+    closeButton.className = 'notification-close';
+    closeButton.innerHTML = '×';
+    closeButton.addEventListener('click', () => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 300);
+    });
+    
+    // Set message and add close button
     notification.textContent = message;
+    notification.appendChild(closeButton);
     
     // Add to page
     document.body.appendChild(notification);

@@ -460,12 +460,12 @@
 }
 
 .keyboard-visible header {
-  position: fixed;                     /* Keep header at top */
+  position: sticky;                    /* Keep consistent with normal state */
   top: 0;                             /* Stick to top of viewport */
-  left: 0;                            /* Full width */
-  right: 0;                           /* Full width */
   z-index: var(--z-header);          /* Above other content */
 }
+
+/* Header positioning is handled by JavaScript */
 
 .keyboard-visible .main-content {
   transition: height 0.3s ease-out;   /* Smooth height transitions */
@@ -542,6 +542,10 @@ body {
 /* === HEADER LAYOUT === */
 header {
   flex-shrink: 0;                      /* Prevent header compression */
+  position: sticky;                    /* Keep header at top */
+  top: 0;                              /* Stick to top */
+  z-index: var(--z-header);           /* Above other content */
+  background: var(--background);       /* Ensure background color */
 }
 
 /* === MAIN CONTENT AREA === */
@@ -674,6 +678,7 @@ header {
 /* === MODAL CONTAINER === */
 /* Main modal box with mobile-first responsive design */
 .mobile-modal {
+  position: relative;                  /* For absolute positioned close button */
   background: var(--surface);          /* Elevated surface background */
   border-radius: var(--radius-lg);     /* Rounded corners for modern look */
   width: 100%;                         /* Full width on small screens */
@@ -701,10 +706,10 @@ header {
 }
 
 /* === MODAL HEADER === */
-/* Title bar with close button */
+/* Title bar with centered title */
 .modal-header {
   display: flex;                       /* Horizontal layout */
-  justify-content: space-between;      /* Title left, close right */
+  justify-content: center;             /* Center the title */
   align-items: center;                 /* Vertical center alignment */
   padding: var(--space-xl);           /* Generous padding for touch */
   border-bottom: 1px solid var(--outline); /* Separator from content */
@@ -719,8 +724,11 @@ header {
 }
 
 /* === MODAL CLOSE BUTTON === */
-/* Touch-friendly close button */
+/* Touch-friendly close button positioned in upper right corner */
 .modal-close {
+  position: absolute;                  /* Position relative to modal */
+  top: var(--space-md);               /* Distance from top edge */
+  right: var(--space-md);             /* Distance from right edge */
   background: none;                    /* Transparent background */
   border: none;                        /* No border */
   color: var(--text-primary);         /* Standard text color */
@@ -734,6 +742,7 @@ header {
   align-items: center;                 /* Vertical centering */
   justify-content: center;             /* Horizontal centering */
   transition: var(--transition-fast);  /* Quick hover response */
+  z-index: 10;                         /* Above modal content */
 }
 
 .modal-close:hover, .modal-close:active {
@@ -870,23 +879,25 @@ header {
 .notification {
   position: fixed;
   top: 70px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-100%);
+  left: 20px;
+  right: 20px;
+  transform: translateY(-100%);
   background: var(--surface);
   color: var(--text-primary);
-  padding: 12px 16px;
+  padding: 12px 40px 12px 16px;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 3000;
+  z-index: 9999;
   opacity: 0;
   transition: all 0.3s ease;
   font-size: 14px;
-  max-width: 280px;
   text-align: center;
+  margin: 0 auto;
+  position: relative;
 }
 
 .notification.show {
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
   opacity: 1;
 }
 
@@ -901,6 +912,95 @@ header {
 /* Body modal state */
 body.modal-open {
   overflow: hidden;
+}
+
+/* Notification close button styles */
+.notification-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 18px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* === ENHANCED CONFIRMATION MODAL === */
+.confirm-destructive .mobile-modal {
+  border-left: 4px solid #f44336;
+}
+
+.confirm-warning .mobile-modal {
+  border-left: 4px solid #ff9800;
+}
+
+.destructive-btn {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  color: white;
+}
+
+.warning-btn {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+}
+
+/* === INITIALIZATION ERROR STYLES === */
+.init-error {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface);
+  border: 2px solid #f44336;
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  z-index: 5000;
+  max-width: 400px;
+  width: 90%;
+}
+
+.init-error h2 {
+  color: #f44336;
+  margin: 0 0 16px 0;
+  font-size: var(--font-size-large);
+}
+
+.init-error p {
+  color: var(--text-primary);
+  margin: 0 0 24px 0;
+  line-height: var(--line-height);
+}
+
+.init-error button {
+  background: var(--primary);
+  color: var(--background);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.init-error button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
 }
 
 

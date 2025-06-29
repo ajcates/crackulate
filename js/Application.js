@@ -1,0 +1,299 @@
+import { DIContainer } from './core/Container.js';
+import { AppState } from './core/AppState.js';
+import { eventBus } from './core/EventBus.js';
+
+// Controllers
+import { EditorController } from './controllers/EditorController.js';
+import { FileController } from './controllers/FileController.js';
+
+// Views
+import { EditorView } from './views/EditorView.js';
+import { FileModalView } from './views/FileModalView.js';
+
+// Services
+import { CalculationService } from './services/CalculationService.js';
+import { FileService } from './services/FileService.js';
+import { NotificationService } from './services/NotificationService.js';
+import { ConfirmationService } from './services/ConfirmationService.js';
+
+/**
+ * Main Application Class
+ * Orchestrates the entire application using dependency injection
+ */
+export class Application {
+  #container = new DIContainer();
+  #controllers = [];
+  #isInitialized = false;
+  
+  /**
+   * Initialize the application
+   */
+  async initialize() {
+    if (this.#isInitialized) {
+      throw new Error('Application already initialized');
+    }
+    
+    try {
+      console.log('Initializing Crackulator application...');
+      
+      await this.#registerServices();
+      await this.#initializeViews();
+      await this.#initializeControllers();
+      await this.#setupGlobalEventHandlers();
+      await this.#registerServiceWorker();
+      await this.#loadInitialState();
+      
+      this.#isInitialized = true;
+      
+      console.log('Crackulator application initialized successfully');
+      await eventBus.emit('app:initialized');
+      
+    } catch (error) {
+      console.error('Failed to initialize application:', error);
+      await this.#handleInitializationError(error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Register all services with the DI container
+   */
+  async #registerServices() {
+    // Import storage first
+    const { storage } = await import('./storageUtils.js');
+    
+    // Core services
+    this.#container.registerSingleton('appState', () => new AppState());
+    this.#container.registerSingleton('notificationService', () => new NotificationService());
+    this.#container.registerSingleton('confirmationService', () => new ConfirmationService());
+    
+    // Storage service (already imported)
+    this.#container.registerInstance('storage', storage);
+    
+    // File service
+    this.#container.register('fileService', (container) => {
+      return new FileService(container.resolve('storage'));
+    });
+    
+    // Calculation service with legacy parser/evaluator
+    this.#container.register('calculationService', () => {
+      return new CalculationService(null, null); // Will use dynamic imports
+    });
+  }
+  
+  /**
+   * Initialize view components
+   */
+  async #initializeViews() {
+    // Editor view
+    const editorContainer = document.querySelector('.main-content');
+    if (!editorContainer) {
+      throw new Error('Editor container not found');
+    }
+    
+    const editorView = new EditorView(editorContainer);
+    this.#container.registerInstance('editorView', editorView);
+    
+    // File modal view
+    const fileModalView = new FileModalView();
+    this.#container.registerInstance('fileModalView', fileModalView);
+  }
+  
+  /**
+   * Initialize controllers
+   */
+  async #initializeControllers() {
+    // Editor controller
+    const editorController = new EditorController(
+      this.#container.resolve('editorView'),
+      this.#container.resolve('appState'),
+      this.#container.resolve('calculationService')
+    );
+    this.#controllers.push(editorController);
+    
+    // File controller
+    const fileController = new FileController(
+      this.#container.resolve('appState'),
+      this.#container.resolve('fileService'),
+      this.#container.resolve('fileModalView'),
+      this.#container.resolve('confirmationService'),
+      this.#container.resolve('notificationService')
+    );
+    this.#controllers.push(fileController);
+    
+    // Register controllers for global access if needed
+    this.#container.registerInstance('editorController', editorController);
+    this.#container.registerInstance('fileController', fileController);
+  }
+  
+  /**
+   * Setup global event handlers
+   */
+  async #setupGlobalEventHandlers() {
+    // Handle undo button
+    const undoBtn = document.getElementById('undo');
+    if (undoBtn) {
+      undoBtn.addEventListener('click', async () => {
+        await eventBus.emit('editor:undo');
+      });
+    }
+    
+    // Handle global keyboard shortcuts
+    document.addEventListener('keydown', async (e) => {
+      // Ctrl/Cmd + S for save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        await eventBus.emit('file:save');
+      }
+      
+      // Ctrl/Cmd + O for open
+      if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+        e.preventDefault();
+        await eventBus.emit('file:open');
+      }
+      
+      // Ctrl/Cmd + N for new
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        await eventBus.emit('file:new');
+      }
+    });
+    
+    // Handle auto-save
+    this.#setupAutoSave();
+  }
+  
+  /**
+   * Setup auto-save functionality
+   */
+  #setupAutoSave() {
+    let autoSaveTimer;
+    
+    eventBus.subscribe('state:changed', async ({ updates }) => {
+      if ('editor.content' in updates) {
+        clearTimeout(autoSaveTimer);
+        
+        autoSaveTimer = setTimeout(async () => {
+          try {
+            const storage = this.#container.resolve('storage');
+            const content = updates['editor.content'];
+            storage.setItem('calcedit_content', content);
+          } catch (error) {
+            console.warn('Auto-save failed:', error);
+          }
+        }, 300);
+      }
+    });
+  }
+  
+  /**
+   * Register service worker for PWA functionality
+   */
+  async #registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        console.log('Service Worker registered:', registration);
+        
+        await eventBus.emit('sw:registered', { registration });
+      } catch (error) {
+        console.warn('Service Worker registration failed:', error);
+      }
+    }
+  }
+  
+  /**
+   * Load initial application state
+   */
+  async #loadInitialState() {
+    try {
+      const storage = this.#container.resolve('storage');
+      const appState = this.#container.resolve('appState');
+      
+      // Try to load auto-saved content
+      const autoSavedContent = storage.getItem('calcedit_content');
+      
+      if (autoSavedContent) {
+        await appState.setState({
+          'editor.content': autoSavedContent
+        });
+      } else {
+        // Load default content
+        const defaultContent = 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
+        await appState.setState({
+          'editor.content': defaultContent
+        });
+      }
+      
+    } catch (error) {
+      console.warn('Failed to load initial state:', error);
+      
+      // Fall back to default state
+      const appState = this.#container.resolve('appState');
+      await appState.setState({
+        'editor.content': 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2'
+      });
+    }
+  }
+  
+  /**
+   * Handle initialization errors
+   */
+  async #handleInitializationError(error) {
+    // Show error to user
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'init-error';
+    errorDiv.innerHTML = `
+      <h2>Application Error</h2>
+      <p>Failed to initialize Crackulator: ${error.message}</p>
+      <button onclick="location.reload()">Reload Page</button>
+    `;
+    
+    document.body.appendChild(errorDiv);
+    
+    // Log detailed error for debugging
+    console.error('Initialization error details:', {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  /**
+   * Clean shutdown of the application
+   */
+  async shutdown() {
+    if (!this.#isInitialized) return;
+    
+    console.log('Shutting down application...');
+    
+    try {
+      // Clean up controllers
+      this.#controllers.forEach(controller => {
+        if (controller.destroy) {
+          controller.destroy();
+        }
+      });
+      
+      // Clear event bus
+      eventBus.clear();
+      
+      // Clear container
+      this.#container.clear();
+      
+      this.#isInitialized = false;
+      
+      console.log('Application shutdown complete');
+      
+    } catch (error) {
+      console.error('Error during shutdown:', error);
+    }
+  }
+  
+  /**
+   * Check if application is initialized
+   */
+  isInitialized() {
+    return this.#isInitialized;
+  }
+}

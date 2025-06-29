@@ -1,52 +1,72 @@
-// File Overview: main.js
-// This file serves as the main entry point for the application's JavaScript logic.
-// Its primary responsibilities are:
-// 1. Importing necessary initialization functions from other modules.
-//    - `initializeEditorUI` from `domUtils.js`: Sets up the main editor interface,
-//      event listeners for input, undo, etc.
-//    - `initializeFileManager` from `fileManager.js`: Sets up event listeners for
-//      file operations like open, save, and new.
-// 2. Registering a Service Worker (`sw.js`):
-//    - If the browser supports service workers, this script attempts to register
-//      `sw.js`. Service workers can enable offline capabilities, background syncing,
-//      and push notifications, though its specific use here would depend on the
-//      contents of `sw.js` (e.g., caching assets for offline use).
-// 3. Executing the initialization functions:
-//    - It calls `initializeEditorUI()` and `initializeFileManager()` to ensure that
-//      all UI elements and event handlers are set up when the application loads.
-// This script is typically one of the last scripts loaded by `index.html` or is loaded
-// with `type="module"` to allow ES6 module syntax.
+/**
+ * Crackulator Main Entry Point
+ * 
+ * Modern refactored version using:
+ * - Dependency injection for loose coupling
+ * - Event-driven architecture for decoupled communication
+ * - ES2022+ features (private fields, async/await)
+ * - High cohesion with separated concerns
+ */
 
-import { initializeEditorUI } from './js/domUtils.js';
-import { initializeFileManager } from './js/fileManager.js';
+import { Application } from './js/Application.js';
 
-// **Service Worker Registration**
-// Checks if the browser supports service workers.
-// Service workers run in the background and can intercept network requests,
-// enabling features like offline caching of application assets.
-if ('serviceWorker' in navigator) {
-  // Attempt to register the service worker script located at 'sw.js'.
-  // The registration is asynchronous and returns a Promise.
-  navigator.serviceWorker.register('sw.js')
-    .then(registration => {
-      // Log a success message to the console if registration is successful.
-      // The `registration` object contains information about the service worker.
-      console.log('Service Worker registered successfully. Scope:', registration.scope);
-    })
-    .catch(error => {
-      // Log an error message to the console if registration fails.
-      console.log('Service Worker registration failed:', error);
+/**
+ * Initialize and start the application
+ */
+async function startApplication() {
+  try {
+    const app = new Application();
+    await app.initialize();
+    
+    // Make app instance available globally for debugging
+    if (typeof window !== 'undefined') {
+      window.__crackulator = app;
+    }
+    
+    // Handle page unload cleanup
+    window.addEventListener('beforeunload', async () => {
+      await app.shutdown();
     });
+    
+  } catch (error) {
+    console.error('Failed to start Crackulator:', error);
+    
+    // Fallback to legacy initialization if new architecture fails
+    console.warn('Falling back to legacy initialization...');
+    await fallbackToLegacy();
+  }
 }
 
-// **Initialize Application UI and Functionality**
+/**
+ * Fallback to legacy initialization
+ */
+async function fallbackToLegacy() {
+  try {
+    const { initializeEditorUI } = await import('./js/domUtils.js');
+    const { initializeFileManager } = await import('./js/fileManager.js');
+    
+    initializeEditorUI();
+    initializeFileManager();
+    
+    console.log('Legacy initialization completed');
+  } catch (error) {
+    console.error('Even legacy initialization failed:', error);
+    
+    // Show critical error to user
+    document.body.innerHTML = `
+      <div style="padding: 20px; text-align: center; font-family: monospace;">
+        <h1>Crackulator - Critical Error</h1>
+        <p>Unable to initialize the application.</p>
+        <p>Please refresh the page or check the console for details.</p>
+        <button onclick="location.reload()" style="padding: 10px 20px; margin-top: 20px;">
+          Reload Page
+        </button>
+      </div>
+    `;
+  }
+}
 
-// Call the initialization function from `domUtils.js`.
-// This sets up the editor, results display, event listeners for typing, undo,
-// and other core UI interactions.
-initializeEditorUI();
-
-// Call the initialization function from `fileManager.js`.
-// This sets up event listeners for file operation buttons (Open, Save As, New)
-// and related modal interactions.
-initializeFileManager();
+// Start the application
+startApplication().catch(error => {
+  console.error('Critical startup error:', error);
+});

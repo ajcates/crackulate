@@ -86,8 +86,9 @@ function updateResults() {
     }
   });
 
-  // After processing all lines, update the globalScope with any new or modified variables from this run.
-  globalScope = { ...tempScope };
+  // After processing all lines, replace the globalScope with the current tempScope.
+  // This ensures that deleted variable definitions are properly removed.
+  globalScope = tempScope;
   // Update the results display in the DOM. Each result gets its own div.
   resultsDiv.innerHTML = results.map(result => `<div>${result}</div>`).join('');
   updateLineNumbers(); // Update line numbers
@@ -227,7 +228,14 @@ function initializeMobileKeyboardHandling() {
   }
   
   // Fallback approach using window resize detection
-  let initialViewportHeight = window.innerHeight;
+  let initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  
+  // Update initial height after a delay to account for browser chrome
+  setTimeout(() => {
+    initialViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    // Force initial layout check
+    handleViewportResize();
+  }, 1000);
   
   function handleViewportResize() {
     const currentHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
@@ -264,12 +272,29 @@ function initializeMobileKeyboardHandling() {
       toolbar.style.bottom = '0px';
       toolbar.style.position = 'fixed';
     } else {
-      // Reset to default layout
+      // Reset to default layout completely
       mainContent.style.height = '';
       mainContent.style.maxHeight = '';
       mainContent.style.paddingBottom = '';
       toolbar.style.bottom = '';
       toolbar.style.position = '';
+      
+      // Explicitly reset ALL header styles to ensure it returns to normal
+      header.style.position = '';
+      header.style.top = '';
+      header.style.left = '';
+      header.style.right = '';
+      header.style.zIndex = '';
+      header.style.width = '';
+      header.style.transform = '';
+      
+      // Trigger a reflow to ensure proper layout restoration
+      document.body.offsetHeight;
+      
+      // Force recalculation after a brief delay
+      setTimeout(() => {
+        document.body.offsetHeight;
+      }, 50);
     }
   }
   
@@ -295,8 +320,81 @@ function initializeMobileKeyboardHandling() {
   }
 }
 
+// **Debug function to check layout state**
+function debugLayout() {
+  const header = document.querySelector('header');
+  const mainContent = document.querySelector('.main-content');
+  const toolbar = document.getElementById('variable-toolbar');
+  const body = document.body;
+  
+  console.log('=== LAYOUT DEBUG ===');
+  console.log('Body classes:', body.className);
+  console.log('Body computed styles:', {
+    display: getComputedStyle(body).display,
+    flexDirection: getComputedStyle(body).flexDirection,
+    height: getComputedStyle(body).height,
+    overflow: getComputedStyle(body).overflow
+  });
+  
+  if (header) {
+    const rect = header.getBoundingClientRect();
+    console.log('Header position:', {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+      visible: rect.top >= 0 && rect.top < window.innerHeight
+    });
+    console.log('Header computed styles:', {
+      position: getComputedStyle(header).position,
+      top: getComputedStyle(header).top,
+      zIndex: getComputedStyle(header).zIndex,
+      display: getComputedStyle(header).display
+    });
+    console.log('Header inline styles:', header.style.cssText);
+  }
+  
+  console.log('Viewport:', {
+    innerHeight: window.innerHeight,
+    visualHeight: window.visualViewport ? window.visualViewport.height : 'N/A'
+  });
+}
+
+// **Debug function to reset layout**
+// Call this if header gets stuck out of view
+function resetLayout() {
+  console.log('Before reset:');
+  debugLayout();
+  
+  document.body.classList.remove('keyboard-visible');
+  const header = document.querySelector('header');
+  const mainContent = document.querySelector('.main-content');
+  const toolbar = document.getElementById('variable-toolbar');
+  
+  // Reset all inline styles
+  [header, mainContent, toolbar].forEach(el => {
+    if (el && el.style) {
+      el.style.cssText = '';
+    }
+  });
+  
+  // Force reflow
+  document.body.offsetHeight;
+  
+  setTimeout(() => {
+    console.log('After reset:');
+    debugLayout();
+  }, 100);
+}
+
+// Make debug functions available globally for debugging
+if (typeof window !== 'undefined') {
+  window.resetLayout = resetLayout;
+  window.debugLayout = debugLayout;
+}
+
 // Export necessary functions and variables for use in other modules (e.g., main.js, fileManager.js).
 // `currentFileName` and `globalScope` are exported directly but their modification logic
 // is primarily within this file or via functions like `clearPage` and `updateResults`.
 // `undoStack` is also exported for `fileManager.js` to reset when loading a file.
-export { editor, resultsDiv, clearPage, updateResults, debouncedUpdate, initializeEditorUI, globalScope, currentFileName, undoStack, updateVariableToolbar };
+export { editor, resultsDiv, clearPage, updateResults, debouncedUpdate, initializeEditorUI, globalScope, currentFileName, undoStack, updateVariableToolbar, resetLayout };
