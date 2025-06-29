@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Start development server with live-server (opens browser)
 npm run dev
 
-# Start development server without opening browser
+# Start development server without opening browser)
 npm run test
 
 # The project uses live-server for development - it serves files and auto-reloads on changes
@@ -92,3 +92,7 @@ npm run test
 - Line numbers are 1-indexed for user display but 0-indexed internally
 - Variables are case-sensitive and can contain letters/numbers
 - Division by zero returns NaN, displayed as '0'
+
+## Project Tone and Style
+
+- keep a hella ghetto crack dealin tone through da projects for real.

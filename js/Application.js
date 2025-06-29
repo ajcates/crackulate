@@ -15,6 +15,7 @@ import { CalculationService } from './services/CalculationService.js';
 import { FileService } from './services/FileService.js';
 import { NotificationService } from './services/NotificationService.js';
 import { ConfirmationService } from './services/ConfirmationService.js';
+import { SharingService } from './services/SharingService.js';
 
 /**
  * Main Application Class
@@ -34,14 +35,14 @@ export class Application {
     }
     
     try {
-      console.log('Initializing Crackulator application...');
+      console.log('Initializing Crackulator application...', 'URL:', window.location.href);
       
       await this.#registerServices();
+      await this.#loadInitialState();
       await this.#initializeViews();
       await this.#initializeControllers();
       await this.#setupGlobalEventHandlers();
       await this.#registerServiceWorker();
-      await this.#loadInitialState();
       
       this.#isInitialized = true;
       
@@ -66,6 +67,7 @@ export class Application {
     this.#container.registerSingleton('appState', () => new AppState());
     this.#container.registerSingleton('notificationService', () => new NotificationService());
     this.#container.registerSingleton('confirmationService', () => new ConfirmationService());
+    this.#container.registerSingleton('sharingService', () => new SharingService());
     
     // Storage service (already imported)
     this.#container.registerInstance('storage', storage);
@@ -103,6 +105,11 @@ export class Application {
    * Initialize controllers
    */
   async #initializeControllers() {
+    console.log('Application.#initializeControllers() - Starting controller initialization');
+    const appState = this.#container.resolve('appState');
+    const currentContent = appState.getState('editor.content');
+    console.log('Application.#initializeControllers() - Current content in state before creating EditorController:', currentContent);
+    
     // Editor controller
     const editorController = new EditorController(
       this.#container.resolve('editorView'),
@@ -135,6 +142,14 @@ export class Application {
     if (undoBtn) {
       undoBtn.addEventListener('click', async () => {
         await eventBus.emit('editor:undo');
+      });
+    }
+    
+    // Handle share button
+    const shareBtn = document.getElementById('share');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async () => {
+        await this.#handleShare();
       });
     }
     
@@ -203,26 +218,137 @@ export class Application {
   }
   
   /**
+   * Handle share button click
+   */
+  async #handleShare() {
+    try {
+      const appState = this.#container.resolve('appState');
+      const sharingService = this.#container.resolve('sharingService');
+      const notificationService = this.#container.resolve('notificationService');
+      
+      const content = appState.getState('editor.content');
+      const currentFile = appState.getState('currentFile');
+      
+      if (!content || content.trim().length === 0) {
+        await notificationService.show('Nothing to share - editor is empty', 'warning');
+        return;
+      }
+      
+      // Validate content can be shared
+      const validation = sharingService.validateSharingContent(content);
+      if (!validation.valid) {
+        await notificationService.show(`Cannot share: ${validation.reason}`, 'error');
+        return;
+      }
+      
+      // Create and copy share URL
+      const result = await sharingService.shareCalculation(content, currentFile);
+      
+      if (result.copied) {
+        const stats = sharingService.getSharingStats(content);
+        await notificationService.show(
+          `Share URL copied to clipboard! (${stats.estimatedSavings} compression)`, 
+          'success'
+        );
+      } else {
+        await notificationService.show('Share URL created but failed to copy to clipboard', 'warning');
+        console.log('Share URL:', result.url);
+      }
+      
+    } catch (error) {
+      console.error('Share error:', error);
+      const notificationService = this.#container.resolve('notificationService');
+      await notificationService.show('Failed to create share URL', 'error');
+    }
+  }
+  
+  /**
    * Load initial application state
    */
   async #loadInitialState() {
     try {
       const storage = this.#container.resolve('storage');
       const appState = this.#container.resolve('appState');
+      const sharingService = this.#container.resolve('sharingService');
+      const notificationService = this.#container.resolve('notificationService');
       
-      // Try to load auto-saved content
-      const autoSavedContent = storage.getItem('calcedit_content');
+      let contentToLoad = null;
+      let filename = null;
       
-      if (autoSavedContent) {
-        await appState.setState({
-          'editor.content': autoSavedContent
-        });
+      // First, check if there's shared content in the URL
+      console.log('Application.#loadInitialState() - Checking for shared content...');
+      if (sharingService.hasSharedContent()) {
+        console.log('Application.#loadInitialState() - Shared content detected!');
+        try {
+          const sharedData = sharingService.parseShareUrl();
+          console.log('Application.#loadInitialState() - Parsed shared data:', sharedData);
+          if (sharedData) {
+            contentToLoad = sharedData.content;
+            filename = sharedData.filename || 'Shared Calculation';
+            console.log('Application.#loadInitialState() - Will load shared content:', contentToLoad);
+            
+            // Show notification about loaded shared content
+            try {
+              await notificationService.show(
+                `Loaded shared calculation${filename ? ` "${filename}"` : ''}`, 
+                'success'
+              );
+            } catch (notifyError) {
+              console.warn('Failed to show notification:', notifyError);
+            }
+            
+            // Clear the URL hash to make the URL cleaner
+            // sharingService.clearUrlHash(); // Temporarily disabled for debugging
+          }
+        } catch (error) {
+          console.error('Failed to load shared content:', error);
+          await notificationService.show('Failed to load shared content from URL', 'error');
+        }
       } else {
-        // Load default content
-        const defaultContent = 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
-        await appState.setState({
-          'editor.content': defaultContent
+        console.log('Application.#loadInitialState() - No shared content detected');
+      }
+      
+      // If no shared content, try to load auto-saved content
+      console.log('Application.#loadInitialState() - Before auto-save check, contentToLoad:', contentToLoad);
+      console.log('Application.#loadInitialState() - contentToLoad truthy?', !!contentToLoad);
+      if (!contentToLoad) {
+        console.log('Application.#loadInitialState() - No content loaded, checking auto-save...');
+        const autoSavedContent = storage.getItem('calcedit_content');
+        console.log('Application.#loadInitialState() - Auto-saved content from storage:', autoSavedContent);
+        if (autoSavedContent) {
+          contentToLoad = autoSavedContent;
+          filename = 'Untitled';
+          console.log('Application.#loadInitialState() - Using auto-saved content');
+        }
+      } else {
+        console.log('Application.#loadInitialState() - Content already loaded, skipping auto-save');
+      }
+      
+      // If still no content, use default
+      if (!contentToLoad) {
+        contentToLoad = 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
+        filename = 'Untitled';
+      }
+      
+      // Set initial state
+      console.log('Application.#loadInitialState() - Setting state with content:', contentToLoad);
+      console.log('Application.#loadInitialState() - appState object:', appState);
+      
+      try {
+        console.log('Application.#loadInitialState() - About to call setState...');
+        const result = await appState.setState({
+          'editor.content': contentToLoad,
+          'currentFile': filename
         });
+        console.log('Application.#loadInitialState() - setState result:', result);
+        console.log('Application.#loadInitialState() - State set successfully');
+        
+        // Verify state was set correctly
+        const verifyContent = appState.getState('editor.content');
+        console.log('Application.#loadInitialState() - State verification - content in state:', verifyContent);
+      } catch (stateError) {
+        console.error('Application.#loadInitialState() - Error setting state:', stateError);
+        console.error('Application.#loadInitialState() - Error stack:', stateError.stack);
       }
       
     } catch (error) {
@@ -231,7 +357,8 @@ export class Application {
       // Fall back to default state
       const appState = this.#container.resolve('appState');
       await appState.setState({
-        'editor.content': 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2'
+        'editor.content': 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2',
+        'currentFile': 'Untitled'
       });
     }
   }

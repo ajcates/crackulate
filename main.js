@@ -8,6 +8,9 @@
  * - High cohesion with separated concerns
  */
 
+// Initialize enhanced console first for debugging
+import './js/utils/EnhancedConsole.js';
+
 import { Application } from './js/Application.js';
 
 /**
@@ -30,9 +33,10 @@ async function startApplication() {
     
   } catch (error) {
     console.error('Failed to start Crackulator:', error);
+    console.log('APPLICATION INITIALIZATION FAILED - FALLING BACK TO LEGACY');
     
     // Fallback to legacy initialization if new architecture fails
-    console.warn('Falling back to legacy initialization...');
+    console.warn('Falling back to legacy initialization...', 'URL:', window.location.href);
     await fallbackToLegacy();
   }
 }
@@ -44,8 +48,36 @@ async function fallbackToLegacy() {
   try {
     const { initializeEditorUI } = await import('./js/domUtils.js');
     const { initializeFileManager } = await import('./js/fileManager.js');
+    const { SharingService } = await import('./js/services/SharingService.js');
     
-    initializeEditorUI();
+    // Check for shared content first
+    const sharingService = new SharingService();
+    let sharedContent = null;
+    
+    if (sharingService.hasSharedContent()) {
+      try {
+        const sharedData = sharingService.parseShareUrl();
+        if (sharedData) {
+          sharedContent = sharedData.content;
+          console.log('Loaded shared content in legacy mode:', sharedData.filename || 'Untitled');
+          
+          // Clear the URL hash
+          // sharingService.clearUrlHash(); // Temporarily disabled for debugging
+          
+          // Show notification if possible
+          if (window.fileManager && window.fileManager.showNotification) {
+            window.fileManager.showNotification(
+              `Loaded shared calculation${sharedData.filename ? ` "${sharedData.filename}"` : ''}`,
+              'success'
+            );
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load shared content in legacy mode:', error);
+      }
+    }
+    
+    initializeEditorUI(sharedContent); // Pass shared content to legacy init
     initializeFileManager();
     
     console.log('Legacy initialization completed');

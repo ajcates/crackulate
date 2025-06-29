@@ -146,12 +146,22 @@ function clearPage() {
 // **Initialize Editor UI Function**
 // Encapsulates the setup of the editor and related UI elements when the page loads.
 // It does not handle file operation event listeners, which are in fileManager.js.
-function initializeEditorUI() {
+function initializeEditorUI(sharedContent = null) {
   // **Initialize Editor Content**
-  // Attempt to load content that was previously autosaved to localStorage.
-  const savedContent = getAutosave();
-  // If saved content exists, use it; otherwise, use a default example string.
-  editor.value = savedContent || 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
+  // Priority: shared content > autosaved content > default content
+  let contentToLoad = sharedContent;
+  
+  if (!contentToLoad) {
+    // Attempt to load content that was previously autosaved to localStorage.
+    contentToLoad = getAutosave();
+  }
+  
+  if (!contentToLoad) {
+    // Use default example string if no other content available
+    contentToLoad = 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
+  }
+  
+  editor.value = contentToLoad;
   // Initialize the undo stack with the initial content (either saved or default).
   undoStack = [editor.value];
   updateResults(); // Perform an initial calculation and display of results.

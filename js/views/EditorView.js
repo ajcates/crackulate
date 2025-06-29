@@ -128,14 +128,22 @@ export class EditorView {
    * @param {string} content - New content
    */
   setContent(content) {
+    console.log('EditorView.setContent() - received content:', content);
+    console.log('EditorView.setContent() - current editor value:', this.#elements.editor.value);
+    
     if (this.#elements.editor.value !== content) {
       const cursorPos = this.#elements.editor.selectionStart;
+      console.log('EditorView.setContent() - setting editor value to:', content);
       this.#elements.editor.value = content;
       
       // Restore cursor position if reasonable
       if (cursorPos <= content.length) {
         this.#elements.editor.setSelectionRange(cursorPos, cursorPos);
       }
+      
+      console.log('EditorView.setContent() - editor value after setting:', this.#elements.editor.value);
+    } else {
+      console.log('EditorView.setContent() - content unchanged, skipping update');
     }
   }
   
