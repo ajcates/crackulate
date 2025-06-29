@@ -35,7 +35,7 @@ export class Application {
     }
     
     try {
-      console.log('Initializing Crackulator application...', 'URL:', window.location.href);
+      console.log('Initializing Crackulator application...');
       
       await this.#registerServices();
       await this.#loadInitialState();
@@ -105,11 +105,6 @@ export class Application {
    * Initialize controllers
    */
   async #initializeControllers() {
-    console.log('Application.#initializeControllers() - Starting controller initialization');
-    const appState = this.#container.resolve('appState');
-    const currentContent = appState.getState('editor.content');
-    console.log('Application.#initializeControllers() - Current content in state before creating EditorController:', currentContent);
-    
     // Editor controller
     const editorController = new EditorController(
       this.#container.resolve('editorView'),
@@ -276,16 +271,12 @@ export class Application {
       let filename = null;
       
       // First, check if there's shared content in the URL
-      console.log('Application.#loadInitialState() - Checking for shared content...');
       if (sharingService.hasSharedContent()) {
-        console.log('Application.#loadInitialState() - Shared content detected!');
         try {
           const sharedData = sharingService.parseShareUrl();
-          console.log('Application.#loadInitialState() - Parsed shared data:', sharedData);
           if (sharedData) {
             contentToLoad = sharedData.content;
             filename = sharedData.filename || 'Shared Calculation';
-            console.log('Application.#loadInitialState() - Will load shared content:', contentToLoad);
             
             // Show notification about loaded shared content
             try {
@@ -298,30 +289,21 @@ export class Application {
             }
             
             // Clear the URL hash to make the URL cleaner
-            // sharingService.clearUrlHash(); // Temporarily disabled for debugging
+            sharingService.clearUrlHash();
           }
         } catch (error) {
           console.error('Failed to load shared content:', error);
           await notificationService.show('Failed to load shared content from URL', 'error');
         }
-      } else {
-        console.log('Application.#loadInitialState() - No shared content detected');
       }
       
       // If no shared content, try to load auto-saved content
-      console.log('Application.#loadInitialState() - Before auto-save check, contentToLoad:', contentToLoad);
-      console.log('Application.#loadInitialState() - contentToLoad truthy?', !!contentToLoad);
       if (!contentToLoad) {
-        console.log('Application.#loadInitialState() - No content loaded, checking auto-save...');
         const autoSavedContent = storage.getItem('calcedit_content');
-        console.log('Application.#loadInitialState() - Auto-saved content from storage:', autoSavedContent);
         if (autoSavedContent) {
           contentToLoad = autoSavedContent;
           filename = 'Untitled';
-          console.log('Application.#loadInitialState() - Using auto-saved content');
         }
-      } else {
-        console.log('Application.#loadInitialState() - Content already loaded, skipping auto-save');
       }
       
       // If still no content, use default
@@ -331,25 +313,10 @@ export class Application {
       }
       
       // Set initial state
-      console.log('Application.#loadInitialState() - Setting state with content:', contentToLoad);
-      console.log('Application.#loadInitialState() - appState object:', appState);
-      
-      try {
-        console.log('Application.#loadInitialState() - About to call setState...');
-        const result = await appState.setState({
-          'editor.content': contentToLoad,
-          'currentFile': filename
-        });
-        console.log('Application.#loadInitialState() - setState result:', result);
-        console.log('Application.#loadInitialState() - State set successfully');
-        
-        // Verify state was set correctly
-        const verifyContent = appState.getState('editor.content');
-        console.log('Application.#loadInitialState() - State verification - content in state:', verifyContent);
-      } catch (stateError) {
-        console.error('Application.#loadInitialState() - Error setting state:', stateError);
-        console.error('Application.#loadInitialState() - Error stack:', stateError.stack);
-      }
+      await appState.setState({
+        'editor.content': contentToLoad,
+        'currentFile': filename
+      });
       
     } catch (error) {
       console.warn('Failed to load initial state:', error);

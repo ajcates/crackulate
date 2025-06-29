@@ -56,29 +56,21 @@ export class SharingService {
   parseShareUrl(url = null) {
     try {
       const targetUrl = url || window.location.href;
-      console.log('SharingService.parseShareUrl() - targetUrl:', targetUrl);
-      
       const hashIndex = targetUrl.indexOf('#');
       
       if (hashIndex === -1) {
-        console.log('SharingService.parseShareUrl() - No hash in URL');
         return null; // No hash in URL
       }
       
       const hash = targetUrl.substring(hashIndex + 1);
-      console.log('SharingService.parseShareUrl() - hash:', hash);
       
       if (!hash) {
-        console.log('SharingService.parseShareUrl() - Empty hash');
         return null; // Empty hash
       }
       
       // Decode share data
       const shareDataJson = atob(hash);
-      console.log('SharingService.parseShareUrl() - shareDataJson:', shareDataJson);
-      
       const shareData = JSON.parse(shareDataJson);
-      console.log('SharingService.parseShareUrl() - shareData:', shareData);
       
       // Validate version
       if (!shareData.v || shareData.v !== 1) {
@@ -88,7 +80,6 @@ export class SharingService {
       
       // Decompress content
       const content = CompressionService.decompress(shareData.d);
-      console.log('SharingService.parseShareUrl() - decompressed content:', content);
       
       if (!content) {
         throw new Error('Failed to decompress shared content');
@@ -106,7 +97,6 @@ export class SharingService {
         result.date = new Date(shareData.t);
       }
       
-      console.log('SharingService.parseShareUrl() - final result:', result);
       return result;
     } catch (error) {
       console.error('Error parsing share URL:', error);
@@ -119,9 +109,7 @@ export class SharingService {
    * @returns {boolean}
    */
   hasSharedContent() {
-    const result = this.parseShareUrl() !== null;
-    console.log('SharingService.hasSharedContent():', result, 'URL:', window.location.href);
-    return result;
+    return this.parseShareUrl() !== null;
   }
   
   /**

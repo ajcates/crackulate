@@ -33,10 +33,9 @@ async function startApplication() {
     
   } catch (error) {
     console.error('Failed to start Crackulator:', error);
-    console.log('APPLICATION INITIALIZATION FAILED - FALLING BACK TO LEGACY');
     
     // Fallback to legacy initialization if new architecture fails
-    console.warn('Falling back to legacy initialization...', 'URL:', window.location.href);
+    console.warn('Falling back to legacy initialization...');
     await fallbackToLegacy();
   }
 }
@@ -59,10 +58,9 @@ async function fallbackToLegacy() {
         const sharedData = sharingService.parseShareUrl();
         if (sharedData) {
           sharedContent = sharedData.content;
-          console.log('Loaded shared content in legacy mode:', sharedData.filename || 'Untitled');
           
           // Clear the URL hash
-          // sharingService.clearUrlHash(); // Temporarily disabled for debugging
+          sharingService.clearUrlHash();
           
           // Show notification if possible
           if (window.fileManager && window.fileManager.showNotification) {

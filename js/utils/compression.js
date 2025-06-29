@@ -217,9 +217,6 @@ export class CompressionService {
       const jsonString = JSON.stringify(data);
       const base64 = btoa(unescape(encodeURIComponent(jsonString)));
       
-      console.log('CompressionService.compress() - original:', text);
-      console.log('CompressionService.compress() - base64:', base64);
-      
       return base64;
     } catch (error) {
       console.error('Compression error:', error);
@@ -238,19 +235,11 @@ export class CompressionService {
         return '';
       }
       
-      console.log('CompressionService.decompress() - input:', compressed);
-      
-      // Step 1: Decode Base64
+      // Decode Base64
       const jsonString = decodeURIComponent(escape(atob(compressed)));
-      console.log('CompressionService.decompress() - jsonString:', jsonString);
-      
       const data = JSON.parse(jsonString);
-      console.log('CompressionService.decompress() - data:', data);
       
-      const original = data.content;
-      console.log('CompressionService.decompress() - original:', original);
-      
-      return original;
+      return data.content;
     } catch (error) {
       console.error('Decompression error:', error);
       return '';

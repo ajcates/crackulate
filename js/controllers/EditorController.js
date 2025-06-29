@@ -49,9 +49,6 @@ export class EditorController {
     const variables = this.#state.getState('variables');
     const history = this.#state.getState('history');
     
-    console.log('EditorController.#initializeView() - content from state:', content);
-    console.log('EditorController.#initializeView() - variables from state:', variables);
-    
     // Initialize history if empty
     if (history.length === 0 && content) {
       await this.#state.setState({
@@ -59,13 +56,11 @@ export class EditorController {
       });
     }
     
-    console.log('EditorController.#initializeView() - setting content in view:', content);
     this.#view.setContent(content);
     this.#view.updateVariableToolbar(Object.keys(variables));
     
     // Trigger initial calculation if content exists
     if (content && content.trim()) {
-      console.log('EditorController.#initializeView() - triggering calculation for:', content);
       await this.#calculateResults(content);
     }
   }
