@@ -15,6 +15,8 @@ export class AppState {
     currentFile: null,
     results: [],
     history: [],
+    tabs: [],
+    activeTabId: null,
     ui: {
       isModalOpen: false,
       hasUnsavedChanges: false
@@ -35,13 +37,21 @@ export class AppState {
     this.registerValidator('editor', (editor) => {
       return editor && typeof editor.content === 'string';
     });
-    
+
     this.registerValidator('variables', (variables) => {
       return variables && typeof variables === 'object';
     });
-    
+
     this.registerValidator('results', (results) => {
       return Array.isArray(results);
+    });
+
+    this.registerValidator('tabs', (tabs) => {
+      return Array.isArray(tabs);
+    });
+
+    this.registerValidator('activeTabId', (activeTabId) => {
+      return activeTabId === null || typeof activeTabId === 'string';
     });
   }
   
@@ -147,6 +157,8 @@ export class AppState {
       currentFile: null,
       results: [],
       history: [],
+      tabs: [],
+      activeTabId: null,
       'ui.isModalOpen': false,
       'ui.hasUnsavedChanges': false
     });

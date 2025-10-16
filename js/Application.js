@@ -5,10 +5,12 @@ import { eventBus } from './core/EventBus.js';
 // Controllers
 import { EditorController } from './controllers/EditorController.js';
 import { FileController } from './controllers/FileController.js';
+import { TabController } from './controllers/TabController.js';
 
 // Views
 import { EditorView } from './views/EditorView.js';
 import { FileModalView } from './views/FileModalView.js';
+import { TabView } from './views/TabView.js';
 
 // Services
 import { CalculationService } from './services/CalculationService.js';
@@ -16,6 +18,7 @@ import { FileService } from './services/FileService.js';
 import { NotificationService } from './services/NotificationService.js';
 import { ConfirmationService } from './services/ConfirmationService.js';
 import { SharingService } from './services/SharingService.js';
+import { TabService } from './services/TabService.js';
 
 /**
  * Main Application Class
@@ -62,21 +65,22 @@ export class Application {
   async #registerServices() {
     // Import storage first
     const { storage } = await import('./storageUtils.js');
-    
+
     // Core services
     this.#container.registerSingleton('appState', () => new AppState());
     this.#container.registerSingleton('notificationService', () => new NotificationService());
     this.#container.registerSingleton('confirmationService', () => new ConfirmationService());
     this.#container.registerSingleton('sharingService', () => new SharingService());
-    
+    this.#container.registerSingleton('tabService', () => new TabService());
+
     // Storage service (already imported)
     this.#container.registerInstance('storage', storage);
-    
+
     // File service
     this.#container.register('fileService', (container) => {
       return new FileService(container.resolve('storage'));
     });
-    
+
     // Calculation service with legacy parser/evaluator
     this.#container.register('calculationService', () => {
       return new CalculationService(null, null); // Will use dynamic imports
@@ -92,10 +96,19 @@ export class Application {
     if (!editorContainer) {
       throw new Error('Editor container not found');
     }
-    
+
     const editorView = new EditorView(editorContainer);
     this.#container.registerInstance('editorView', editorView);
-    
+
+    // Tab view
+    const tabContainer = document.querySelector('.tab-container');
+    if (!tabContainer) {
+      throw new Error('Tab container not found');
+    }
+
+    const tabView = new TabView(tabContainer);
+    this.#container.registerInstance('tabView', tabView);
+
     // File modal view
     const fileModalView = new FileModalView();
     this.#container.registerInstance('fileModalView', fileModalView);
@@ -105,6 +118,14 @@ export class Application {
    * Initialize controllers
    */
   async #initializeControllers() {
+    // Tab controller (initialize first since editor depends on tabs)
+    const tabController = new TabController(
+      this.#container.resolve('tabView'),
+      this.#container.resolve('appState'),
+      this.#container.resolve('tabService')
+    );
+    this.#controllers.push(tabController);
+
     // Editor controller
     const editorController = new EditorController(
       this.#container.resolve('editorView'),
@@ -112,7 +133,7 @@ export class Application {
       this.#container.resolve('calculationService')
     );
     this.#controllers.push(editorController);
-    
+
     // File controller
     const fileController = new FileController(
       this.#container.resolve('appState'),
@@ -122,8 +143,9 @@ export class Application {
       this.#container.resolve('notificationService')
     );
     this.#controllers.push(fileController);
-    
+
     // Register controllers for global access if needed
+    this.#container.registerInstance('tabController', tabController);
     this.#container.registerInstance('editorController', editorController);
     this.#container.registerInstance('fileController', fileController);
   }

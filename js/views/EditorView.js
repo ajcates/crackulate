@@ -191,16 +191,19 @@ export class EditorView {
       this.#elements.variableToolbar.style.display = 'none';
       return;
     }
-    
-    const variableButtons = variables.map(variable => {
+
+    // Clear existing buttons
+    this.#elements.variableToolbar.innerHTML = '';
+
+    // Create and append button elements (not HTML strings) to preserve event listeners
+    variables.forEach(variable => {
       const button = document.createElement('button');
       button.className = 'variable-btn';
       button.textContent = variable;
       button.addEventListener('click', () => this.#insertVariable(variable));
-      return button.outerHTML;
+      this.#elements.variableToolbar.appendChild(button);
     });
-    
-    this.#elements.variableToolbar.innerHTML = variableButtons.join('');
+
     this.#elements.variableToolbar.style.display = 'flex';
   }
   

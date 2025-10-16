@@ -1004,3 +1004,224 @@ body.modal-open {
 }
 
 
+/* === TAB BAR SYSTEM === */
+/* Tabbed interface for managing multiple files */
+
+/* === TAB CONTAINER === */
+/* Horizontal bar below header containing tabs */
+.tab-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--outline);
+  padding: var(--space-sm) var(--space-md);
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: var(--space-sm);
+  height: 44px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+}
+
+/* Hide scrollbar but allow scrolling */
+.tab-bar::-webkit-scrollbar {
+  height: 0;
+  display: none;
+}
+
+.tab-bar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* === TABS CONTAINER === */
+/* Container for individual tabs */
+.tabs-container {
+  display: flex;
+  gap: var(--space-sm);
+  flex: 1;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* === INDIVIDUAL TAB === */
+/* Single tab representing one open file */
+.tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  min-width: 80px;
+  max-width: 180px;
+  height: 36px;
+  position: relative;
+}
+
+.tab:hover {
+  background: var(--outline);
+  border-color: var(--primary);
+}
+
+/* === ACTIVE TAB === */
+/* Highlighted tab showing currently open file */
+.tab.active {
+  background: var(--background);
+  border-bottom-color: var(--background);
+  color: var(--primary);
+  font-weight: 500;
+  border-top: 2px solid var(--primary);
+}
+
+/* === DIRTY TAB INDICATOR === */
+/* Visual indicator for unsaved changes */
+.tab.dirty .tab-name::after {
+  content: '●';
+  margin-left: var(--space-xs);
+  color: var(--accent);
+  font-size: 10px;
+}
+
+/* === TAB NAME === */
+/* Editable tab name */
+.tab-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  min-width: 40px;
+}
+
+/* === TAB NAME INPUT === */
+/* Inline editing input for tab names */
+.tab-name-input {
+  background: var(--background);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-xs);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  outline: none;
+  width: 100px;
+  max-width: 150px;
+}
+
+/* === TAB CLOSE BUTTON === */
+/* Close button for each tab */
+.tab-close {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition-fast);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.tab-close:hover {
+  background: var(--accent);
+  opacity: 1;
+  color: white;
+}
+
+.tab.active .tab-close {
+  opacity: 1;
+}
+
+/* === ADD TAB BUTTON === */
+/* Button to create new tab */
+.tab-add-btn {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+.tab-add-btn:hover {
+  background: var(--primary);
+  color: black;
+  transform: scale(1.1);
+}
+
+/* === MOBILE TAB OPTIMIZATIONS === */
+@media screen and (max-width: 768px) {
+  .tab {
+    min-width: 70px;
+    max-width: 140px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 12px;
+  }
+
+  .tab-bar {
+    padding: var(--space-xs) var(--space-sm);
+    height: 40px;
+  }
+
+  .tab-add-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+  }
+}
+
+/* === LAYOUT ADJUSTMENTS FOR TAB BAR === */
+/* Adjust main content to account for tab bar */
+body .main-content {
+  height: calc(100vh - var(--header-height) - 44px - var(--toolbar-height));
+}
+
+@supports (height: 100dvh) {
+  body .main-content {
+    height: calc(100dvh - var(--header-height) - 44px - var(--toolbar-height));
+  }
+
+  .keyboard-visible .main-content {
+    height: calc(100svh - var(--header-height) - 44px - var(--toolbar-height));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body .main-content {
+    height: calc(100vh - var(--header-height) - 40px - var(--toolbar-height));
+  }
+
+  @supports (height: 100dvh) {
+    body .main-content {
+      height: calc(100dvh - var(--header-height) - 40px - var(--toolbar-height));
+    }
+
+    .keyboard-visible .main-content {
+      height: calc(100svh - var(--header-height) - 40px - var(--toolbar-height));
+    }
+  }
+}
