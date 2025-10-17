@@ -707,29 +707,28 @@
   }
 }
 
-/* === VARIABLE BUTTONS (Material 3) === */
-/* Dynamic buttons for each user-defined variable with M3 micro-interactions */
+/* === VARIABLE BUTTONS (Material 3 Suggestion Chips) === */
+/* Dynamic chip-style buttons for each user-defined variable */
 #variable-toolbar button {
   position: relative;                  /* For state layer positioning */
-  color: var(--text-primary);         /* High contrast text */
-  background: linear-gradient(180deg, var(--accent), var(--accent-dark)); /* Distinctive gradient */
-  border: 1px solid var(--outline);   /* Subtle border */
-  padding: var(--space-md) var(--space-xl); /* Pill-shaped padding */
+  color: var(--md-sys-color-on-secondary-container); /* M3 chip text color */
+  background: var(--md-sys-color-secondary-container); /* M3 filled chip background */
+  border: none;                        /* No border for filled chips */
+  padding: 6px 16px;                   /* Compact chip padding */
   cursor: pointer;                     /* Indicate interactive element */
-  margin-right: var(--space-md);      /* Space between buttons */
+  margin-right: var(--space-md);      /* Space between chips */
   margin-bottom: var(--space-md);     /* Space for wrapped rows */
-  border-radius: var(--md-sys-shape-corner-full); /* M3 fully rounded */
+  border-radius: var(--md-sys-shape-corner-medium); /* M3 medium corners (12px) */
   font-family: var(--font-family);    /* Consistent monospace font */
   font-size: var(--font-size-small);  /* Compact text size */
-  min-height: 40px;                    /* M3 minimum button height for adequate touch target */
+  min-height: 32px;                    /* M3 chip height (smaller than buttons) */
   display: inline-flex;                /* Flexbox for vertical centering */
   align-items: center;                 /* Center text vertically */
-  transition: transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized), /* Scale animation */
-              box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard); /* Shadow animation */
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard); /* Only shadow animation */
   white-space: nowrap;                 /* Prevent text wrapping */
   overflow: hidden;                    /* Contain state layer */
   user-select: none;                   /* Prevent text selection */
-  box-shadow: var(--md-sys-elevation-1); /* Subtle elevation */
+  box-shadow: none;                    /* Chips are flat by default */
 }
 
 /* === STATE LAYER === */
@@ -738,29 +737,29 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-color: rgba(255, 255, 255, 0.2); /* Light overlay */
+  background-color: var(--md-sys-color-on-secondary-container); /* Match text color for state layer */
   opacity: 0;
-  border-radius: var(--md-sys-shape-corner-full);
+  border-radius: var(--md-sys-shape-corner-medium); /* Match chip corners */
   transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
 }
 
-/* === VARIABLE BUTTON INTERACTION STATES === */
+/* === CHIP INTERACTION STATES (M3) === */
+/* Chips use subtle state layers instead of lifts */
 #variable-toolbar button:hover {
-  transform: translateY(-2px);         /* Lift on hover */
-  box-shadow: var(--md-sys-elevation-2); /* Increased elevation */
+  box-shadow: var(--md-sys-elevation-1); /* Subtle elevation on hover */
 }
 
 #variable-toolbar button:hover::before {
-  opacity: 1;                          /* Show state layer */
+  opacity: var(--md-sys-state-hover-opacity); /* M3 hover state layer (8%) */
 }
 
 #variable-toolbar button:active {
-  transform: translateY(0) scale(0.96); /* Press down and scale */
-  box-shadow: var(--md-sys-elevation-1); /* Reduce elevation when pressed */
+  transform: scale(0.96);              /* Subtle press scale only */
+  box-shadow: none;                    /* Remove elevation when pressed */
 }
 
 #variable-toolbar button:active::before {
-  opacity: 0.5;                        /* Dim state layer on press */
+  opacity: var(--md-sys-state-pressed-opacity); /* M3 pressed state layer (12%) */
 }
 
 /* === FOCUS STATE === */
