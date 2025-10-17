@@ -494,8 +494,8 @@
     .line-numbers {
       width: var(--line-numbers-width);    /* Fixed width for consistent alignment */
       height: 100%;                        /* Fill container height */
-      background-color: var(--surface);   /* Subtle background differentiation */
-      color: var(--text-primary);         /* High contrast text */
+      background-color: var(--md-sys-color-surface-container-lowest); /* M3 surface */
+      color: var(--md-sys-color-on-surface-variant); /* M3 secondary text */
       font-family: var(--font-family);    /* Monospace for alignment */
       font-size: var(--font-size-base);   /* Match editor font size */
       line-height: var(--line-height);    /* Match editor line height */
@@ -504,17 +504,17 @@
       overflow: hidden;                   /* Sync scroll with editor */
       user-select: none;                  /* Prevent accidental selection */
       box-sizing: border-box;             /* Include padding in width */
-      border-right: 1px solid var(--outline); /* Separator from editor */
+      border-right: 1px solid var(--md-sys-color-outline-variant); /* M3 separator */
     }
-    
+
     /* === MAIN EDITOR === */
     /* Primary text input area for mathematical expressions */
     .editor {
       width: 100%;                         /* Take available space */
       height: 100%;                        /* Fill container height */
       overflow: auto;                      /* Enable scrolling for long content */
-      background-color: var(--surface);   /* Clean background */
-      color: var(--text-primary);         /* High contrast text */
+      background-color: var(--md-sys-color-surface); /* M3 surface */
+      color: var(--md-sys-color-on-surface); /* M3 text color */
       font-family: var(--font-family);    /* Monospace for code alignment */
       font-size: var(--font-size-base);   /* Readable font size */
       line-height: var(--line-height);    /* Optimal line spacing */
@@ -534,14 +534,14 @@
       min-width: 100px;                   /* Minimum readable width */
       height: 100%;                       /* Fill container height */
       overflow: hidden;                   /* Prevent independent scrolling */
-      background-color: var(--surface);  /* Match editor background */
-      color: var(--text-primary);        /* High contrast text */
+      background-color: var(--md-sys-color-surface-container-lowest); /* M3 surface */
+      color: var(--md-sys-color-on-surface); /* M3 text color */
       font-family: var(--font-family);   /* Monospace for alignment */
       font-size: var(--font-size-base);  /* Match editor font size */
       line-height: var(--line-height);   /* Match editor line height */
       box-sizing: border-box;             /* Include padding in width */
       text-align: right;                  /* Right-align results */
-      border-left: 2px solid var(--outline); /* Separator from editor */
+      border-left: 1px solid var(--md-sys-color-outline-variant); /* M3 separator */
       padding: var(--space-md);          /* Match editor padding */
       scroll-behavior: smooth;            /* Smooth scrolling when synced */
       flex: 0 0 var(--results-width);    /* Fixed width, no grow/shrink */
@@ -564,13 +564,13 @@
   left: 0;                            /* Full width alignment */
   width: 100%;                         /* Full viewport width */
   padding: var(--space-md);           /* Comfortable padding around buttons */
-  /* Temporary debugging - make toolbar more visible */
-  background-color: #2a2a2a;          /* Darker background for visibility */
-  border-top: 2px solid var(--primary); /* Bright border for debugging */
+  background-color: var(--md-sys-color-surface-container); /* Material 3 surface */
+  border-top: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle border */
+  box-shadow: var(--md-sys-elevation-2); /* M3 elevation */
   box-sizing: border-box;              /* Include padding in total width */
   z-index: var(--z-toolbar);          /* Above main content, below modals */
   height: var(--toolbar-height);      /* Fixed height for layout calculations */
-  
+
   /* Additional mobile-specific adjustments */
   transform: translateZ(0);            /* Force hardware acceleration */
   will-change: transform;              /* Optimize for position changes */
@@ -685,10 +685,11 @@ header {
 /* === FILE OPERATIONS TOOLBAR === */
 /* Compact mobile-first toolbar for file operations */
 .mobile-toolbar {
-  background-color: var(--background); /* Match page background */
-  border-bottom: 1px solid var(--outline); /* Subtle separator */
+  background-color: var(--md-sys-color-surface-container-low); /* Material 3 surface */
+  border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
   padding: var(--space-sm) var(--space-md); /* Compact but touch-friendly */
   height: var(--header-height);        /* Fixed height for calculations */
+  box-shadow: var(--md-sys-elevation-1); /* Subtle elevation */
 }
 
 /* === TOOLBAR LAYOUT === */
@@ -752,29 +753,50 @@ header {
 /* === MOBILE FILE OPERATION BUTTONS === */
 /* Compact touch-friendly buttons for file operations */
 .btn-mobile {
-  background: var(--surface);             /* Elevated surface color */
-  border: 1px solid var(--outline);      /* Subtle border */
-  border-radius: var(--radius-md);       /* Consistent corner rounding */
-  padding: var(--space-lg);              /* Touch-friendly padding */
-  font-size: var(--font-size-base);      /* Standard icon size */
+  position: relative;                    /* For state layer positioning */
+  background: transparent;               /* Transparent background */
+  border: none;                          /* No border */
+  border-radius: 50%;                    /* Circular icon button */
+  padding: 12px;                         /* M3 icon button padding */
+  font-size: 20px;                       /* Icon size */
   cursor: pointer;                       /* Indicate interactive element */
-  color: var(--text-primary);           /* High contrast text/icons */
-  transition: var(--transition-fast);    /* Quick hover response */
-  min-width: var(--touch-target-sm);     /* Minimum touch target size */
-  min-height: var(--touch-target-sm);    /* Minimum touch target size */
+  color: var(--md-sys-color-on-surface-variant); /* M3 icon color */
+  transition: background-color var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+  width: 48px;                           /* M3 icon button size */
+  height: 48px;                          /* M3 icon button size */
   display: flex;                         /* Center icon content */
   align-items: center;                   /* Vertical centering */
   justify-content: center;               /* Horizontal centering */
+  overflow: hidden;                      /* Contain state layer */
+}
+
+/* State layer for toolbar buttons */
+.btn-mobile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--md-sys-color-on-surface);
+  opacity: 0;
+  border-radius: 50%;
+  transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
 }
 
 /* === BUTTON INTERACTION STATES === */
-.btn-mobile:hover, .btn-mobile:active {
-  background: var(--outline);            /* Subtle highlight on interaction */
+.btn-mobile:hover::before {
+  opacity: var(--md-sys-state-hover-opacity); /* M3 state layer */
 }
 
-.btn-mobile:focus {
-  outline: 2px solid var(--primary);     /* Clear focus indicator */
+.btn-mobile:active::before {
+  opacity: var(--md-sys-state-pressed-opacity); /* M3 pressed state */
+}
+
+.btn-mobile:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary); /* M3 focus ring */
   outline-offset: 2px;                   /* Space around focus ring */
+}
+
+.btn-mobile:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* === MODAL SYSTEM === */
@@ -788,7 +810,7 @@ header {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);      /* Semi-transparent dark backdrop */
+  background: rgba(0, 0, 0, 0.32);     /* Material 3 scrim opacity */
   display: flex;                       /* Center modal content */
   align-items: flex-start;             /* Align to top for mobile */
   justify-content: center;             /* Center horizontally */
@@ -805,13 +827,13 @@ header {
 /* Main modal box with mobile-first responsive design */
 .mobile-modal {
   position: relative;                  /* For absolute positioned close button */
-  background: var(--surface);          /* Elevated surface background */
-  border-radius: var(--radius-lg);     /* Rounded corners for modern look */
+  background: var(--md-sys-color-surface-container-high); /* Material 3 elevated surface */
+  border-radius: var(--md-sys-shape-corner-extra-large); /* M3 large corner radius */
   width: 100%;                         /* Full width on small screens */
   max-width: var(--modal-max-width);   /* Limit width on larger screens */
   margin-top: var(--toolbar-height);   /* Space below header */
-  box-shadow: var(--shadow-strong);    /* Strong shadow for depth */
-  animation: slideDown var(--transition-normal) ease; /* Smooth entrance */
+  box-shadow: var(--md-sys-elevation-3); /* Material 3 elevation level 3 */
+  animation: slideDown var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate); /* M3 motion */
 }
 
 .mobile-modal.small {
@@ -837,48 +859,58 @@ header {
   display: flex;                       /* Horizontal layout */
   justify-content: center;             /* Center the title */
   align-items: center;                 /* Vertical center alignment */
-  padding: var(--space-xl);           /* Generous padding for touch */
-  border-bottom: 1px solid var(--outline); /* Separator from content */
-  background: var(--background);       /* Contrasting header background */
+  padding: 24px;                       /* Material 3 spacing */
+  border-bottom: 1px solid var(--md-sys-color-outline-variant); /* Subtle separator */
+  background: transparent;             /* Use modal background */
 }
 
 .modal-header h2, .modal-header h3 {
   margin: 0;                           /* Remove default margins */
-  color: var(--text-primary);         /* High contrast text */
-  font-size: var(--font-size-base);   /* Standard readable size */
-  font-weight: 500;                    /* Medium weight for emphasis */
+  color: var(--md-sys-color-on-surface); /* M3 surface text color */
+  font: var(--md-sys-typescale-headline-small); /* M3 headline typography */
 }
 
 /* === MODAL CLOSE BUTTON === */
 /* Touch-friendly close button positioned in upper right corner */
 .modal-close {
   position: absolute;                  /* Position relative to modal */
-  top: var(--space-md);               /* Distance from top edge */
-  right: var(--space-md);             /* Distance from right edge */
-  background: none;                    /* Transparent background */
+  top: 12px;                          /* Material 3 spacing */
+  right: 12px;                        /* Material 3 spacing */
+  background: transparent;             /* Transparent background */
   border: none;                        /* No border */
-  color: var(--text-primary);         /* Standard text color */
-  font-size: var(--font-size-large);  /* Large for easy tapping */
+  color: var(--md-sys-color-on-surface-variant); /* M3 icon color */
+  font-size: 24px;                    /* Large for easy tapping */
   cursor: pointer;                     /* Indicate interactive */
-  padding: var(--space-md);           /* Touch-friendly padding */
-  border-radius: var(--radius-sm);    /* Subtle corner rounding */
-  min-width: var(--touch-target-sm);  /* Minimum touch target */
-  min-height: var(--touch-target-sm); /* Minimum touch target */
+  padding: 12px;                      /* M3 icon button padding */
+  border-radius: 50%;                 /* Circular icon button */
+  width: 48px;                        /* M3 icon button size */
+  height: 48px;                       /* M3 icon button size */
   display: flex;                       /* Center icon */
   align-items: center;                 /* Vertical centering */
   justify-content: center;             /* Horizontal centering */
-  transition: var(--transition-fast);  /* Quick hover response */
+  transition: background-color var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
   z-index: 10;                         /* Above modal content */
 }
 
-.modal-close:hover, .modal-close:active {
-  background: var(--outline);          /* Subtle highlight on interaction */
+.modal-close:hover {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface), transparent 92%); /* M3 state layer */
+}
+
+.modal-close:active {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface), transparent 88%); /* M3 pressed state */
 }
 
 /* === MODAL CONTENT === */
 /* Main content area of modal */
 .modal-content {
-  padding: var(--space-xl);           /* Generous padding for readability */
+  padding: 24px;                      /* Material 3 spacing */
+  color: var(--md-sys-color-on-surface); /* M3 text color */
+}
+
+.modal-content p {
+  font: var(--md-sys-typescale-body-medium); /* M3 body typography */
+  color: var(--md-sys-color-on-surface-variant); /* Secondary text color */
+  margin: 0 0 16px 0;
 }
 
 /* Simple File List */
@@ -942,63 +974,103 @@ header {
 /* Simple Save Form */
 .mobile-input {
   width: 100%;
-  padding: 16px 12px;
-  background: var(--background);
-  border: 1px solid var(--outline);
-  border-radius: 6px;
-  color: var(--text-primary);
-  font-family: var(--font-family);
+  padding: 16px;
+  background: transparent;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--font-family-ui);
   font-size: 16px;
+  line-height: 24px;
   margin-bottom: 16px;
-  min-height: 44px;
+  min-height: 56px;
   box-sizing: border-box;
+  transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+.mobile-input::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.mobile-input:hover {
+  border-color: var(--md-sys-color-on-surface);
 }
 
 .mobile-input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-width: 2px;
+  border-color: var(--md-sys-color-primary);
+  padding: 15px; /* Compensate for thicker border */
 }
 
 /* Modal Actions */
 .modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: flex-end;
   flex-wrap: wrap;
 }
 
 .action-btn {
-  background: var(--surface);
-  border: 1px solid var(--outline);
-  border-radius: 6px;
-  padding: 12px 20px;
-  cursor: pointer;
-  color: var(--text-primary);
-  font-family: var(--font-family);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 10px 24px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  font-family: var(--font-family-ui);
   font-size: 14px;
   font-weight: 500;
-  min-height: 44px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  overflow: hidden;
+  user-select: none;
   min-width: 80px;
-  transition: background-color 0.2s ease;
 }
 
-.action-btn:hover, .action-btn:active {
-  background: var(--outline);
+/* State layer for action buttons */
+.action-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+}
+
+.action-btn:hover::before {
+  opacity: var(--md-sys-state-hover-opacity);
+}
+
+.action-btn:active::before {
+  opacity: var(--md-sys-state-pressed-opacity);
 }
 
 .save-btn, .confirm-btn {
-  background: var(--primary);
-  color: black;
-  border-color: var(--primary);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border: none;
+  box-shadow: var(--md-sys-elevation-0);
+}
+
+.save-btn:hover, .confirm-btn:hover {
+  box-shadow: var(--md-sys-elevation-1);
 }
 
 .delete-btn {
-  color: #f44336;
-  border-color: #f44336;
+  color: var(--md-sys-color-error);
+  border-color: var(--md-sys-color-error);
 }
 
 .cancel-btn {
-  color: #888;
+  color: var(--md-sys-color-on-surface-variant);
+  border-color: var(--md-sys-color-outline-variant);
 }
 
 /* Simple Notifications */
