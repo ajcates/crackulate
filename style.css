@@ -818,6 +818,65 @@ header {
   height: 100%;                        /* Fill toolbar height */
 }
 
+/* === APP TITLE SECTION (Material 3) === */
+/* Main app title with M3 typography and expressive spacing */
+.app-title-section {
+  flex: 1;                             /* Take available space */
+  display: flex;                       /* Flexbox layout */
+  align-items: center;                 /* Vertical center */
+  justify-content: flex-start;         /* Left align */
+  padding-right: var(--space-xl);     /* Spacing before buttons */
+}
+
+#app-title {
+  font: var(--md-sys-typescale-title-large); /* M3 title-large typography (22px/28px/500) */
+  color: var(--md-sys-color-on-surface); /* M3 surface text color */
+  margin: 0;                           /* Remove default margins */
+  padding: var(--space-xs) var(--space-md); /* Comfortable padding for touch */
+  cursor: pointer;                     /* Indicate it's clickable */
+  border-radius: var(--md-sys-shape-corner-small); /* M3 small corner radius */
+  transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  white-space: nowrap;                 /* Prevent wrapping */
+  overflow: hidden;                    /* Handle long titles */
+  text-overflow: ellipsis;             /* Show ellipsis for overflow */
+  max-width: 300px;                    /* Maximum width */
+  user-select: none;                   /* Prevent selection when not editing */
+  outline: none;                       /* Remove default outline */
+}
+
+#app-title:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface), transparent 92%); /* M3 state layer */
+}
+
+#app-title:active {
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface), transparent 88%); /* M3 pressed state */
+}
+
+#app-title:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary); /* M3 focus ring */
+  outline-offset: 2px;
+}
+
+#app-title:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* When contenteditable is active */
+#app-title[contenteditable="true"] {
+  background-color: var(--md-sys-color-surface-container-highest); /* M3 elevated surface */
+  border: 2px solid var(--md-sys-color-primary); /* M3 primary border */
+  padding: calc(var(--space-xs) - 1px) calc(var(--space-md) - 1px); /* Compensate for border */
+  user-select: text;                   /* Allow selection when editing */
+  cursor: text;                        /* Text cursor */
+}
+
+@media screen and (max-width: 768px) {
+  #app-title {
+    font-size: 18px;                   /* Slightly smaller on mobile */
+    max-width: 200px;                  /* Reduce max width on mobile */
+  }
+}
+
 /* === FILE ACTION BUTTONS === */
 /* Container for New, Open, Save, Undo buttons */
 .file-actions {

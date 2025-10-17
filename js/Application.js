@@ -20,6 +20,9 @@ import { ConfirmationService } from './services/ConfirmationService.js';
 import { SharingService } from './services/SharingService.js';
 import { TabService } from './services/TabService.js';
 
+// Utils
+import { AppTitleHandler } from './utils/AppTitleHandler.js';
+
 /**
  * Main Application Class
  * Orchestrates the entire application using dependency injection
@@ -43,6 +46,7 @@ export class Application {
       await this.#registerServices();
       await this.#loadInitialState();
       await this.#initializeViews();
+      await this.#initializeUtilityHandlers();
       await this.#initializeControllers();
       await this.#setupGlobalEventHandlers();
       await this.#registerServiceWorker();
@@ -113,7 +117,16 @@ export class Application {
     const fileModalView = new FileModalView();
     this.#container.registerInstance('fileModalView', fileModalView);
   }
-  
+
+  /**
+   * Initialize utility handlers
+   */
+  async #initializeUtilityHandlers() {
+    // App title handler - makes title editable and persists changes
+    const appTitleHandler = new AppTitleHandler();
+    this.#container.registerInstance('appTitleHandler', appTitleHandler);
+  }
+
   /**
    * Initialize controllers
    */
