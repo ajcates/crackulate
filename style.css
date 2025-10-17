@@ -802,11 +802,11 @@ header {
 /* === FILE OPERATIONS TOOLBAR === */
 /* Compact mobile-first toolbar for file operations */
 .mobile-toolbar {
-  background-color: var(--md-sys-color-surface-container-lowest); /* Material 3 surface - lowest elevation */
+  background-color: var(--background); /* Base background - no elevation */
   border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
   padding: var(--space-sm) var(--space-md); /* Compact but touch-friendly */
   height: var(--header-height);        /* Fixed height for calculations */
-  box-shadow: var(--md-sys-elevation-1); /* Subtle elevation */
+  box-shadow: none; /* No shadow on base level */
 }
 
 /* === TOOLBAR LAYOUT === */
