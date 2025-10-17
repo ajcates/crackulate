@@ -92,8 +92,9 @@
       
       /* === TYPOGRAPHY PROPERTIES === */
       /* Font properties for consistent text rendering */
-      --font-family: 'Roboto Mono', monospace; /* Monospace for code alignment */
-      --font-weight: 400;              /* Regular weight for body text */
+      --font-family: 'Roboto Mono', monospace; /* Variable font for flexible weights */
+      --font-family-ui: 'Roboto', sans-serif; /* Variable font for UI elements */
+      --font-weight: 400;              /* Regular weight for body text (100-700 available) */
       --font-style: normal;            /* Standard font style */
       --text-decoration: none;         /* Clean text without underlines */
       --text-transform: none;          /* No case transformation */
@@ -588,10 +589,10 @@ header {
   display: flex;                       /* Horizontal layout */
   align-items: center;                 /* Vertical center alignment */
   gap: var(--space-sm);                /* Small gap between name and indicator */
-  font-size: var(--font-size-small);  /* Smaller text for status */
+  font-size: var(--font-size-base);   /* Standard text for status */
   color: var(--text-primary);         /* Standard text color */
   flex: 1;                             /* Take remaining space */
-  justify-content: flex-end;           /* Right-align content */
+  justify-content: flex-start;         /* Left-align content */
   overflow: hidden;                    /* Handle long file names */
 }
 
@@ -600,7 +601,7 @@ header {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
+  max-width: 200px;
 }
 
 #current-file-name.has-file {
@@ -1224,4 +1225,54 @@ body .main-content {
       height: calc(100svh - var(--header-height) - 40px - var(--toolbar-height));
     }
   }
+}
+
+/* === MATERIAL ICONS === */
+/* Styling for Material Icons font */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+  
+  /* Support for all WebKit browsers */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE */
+  font-feature-settings: 'liga';
+}
+
+/* Material Icons sizing variants */
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+/* Material icons in buttons */
+.btn-mobile .material-icons,
+.action-btn .material-icons {
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+/* Material icons in file list */
+.file-icon.material-icons {
+  font-size: 18px;
+  color: var(--primary);
+}
+
+.delete-icon.material-icons {
+  font-size: 18px;
+  color: #f44336;
 }

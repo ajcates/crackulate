@@ -154,9 +154,9 @@ export class FileModalView {
       
       button.className = `file-button${this.#deleteMode ? ' delete-mode' : ''}`;
       button.innerHTML = `
-        <span class="file-icon">📄</span>
+        <span class="material-icons file-icon">description</span>
         <span class="file-name">${this.#escapeHtml(fileName)}</span>
-        ${this.#deleteMode ? '<span class="delete-icon">🗑️</span>' : ''}
+        ${this.#deleteMode ? '<span class="material-icons delete-icon">delete</span>' : ''}
       `;
       
       if (this.#deleteMode) {
@@ -182,25 +182,25 @@ export class FileModalView {
    */
   #toggleDeleteMode() {
     this.#deleteMode = !this.#deleteMode;
-    
+
     if (this.#deleteMode) {
-      this.#elements.deleteToggle.textContent = '❌ Exit';
+      this.#elements.deleteToggle.innerHTML = '<span class="material-icons">close</span> Exit';
       this.#elements.deleteToggle.className = 'action-btn cancel-btn';
     } else {
-      this.#elements.deleteToggle.textContent = '🗑️ Delete';
+      this.#elements.deleteToggle.innerHTML = '<span class="material-icons">delete</span> Delete';
       this.#elements.deleteToggle.className = 'action-btn delete-btn';
     }
-    
+
     // Re-render current file list with new delete mode
     this.#triggerEvent('deleteToggle', this.#deleteMode);
   }
-  
+
   /**
    * Reset delete mode
    */
   #resetDeleteMode() {
     this.#deleteMode = false;
-    this.#elements.deleteToggle.textContent = '🗑️ Delete';
+    this.#elements.deleteToggle.innerHTML = '<span class="material-icons">delete</span> Delete';
     this.#elements.deleteToggle.className = 'action-btn delete-btn';
   }
   
