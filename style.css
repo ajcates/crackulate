@@ -1352,6 +1352,138 @@ body .main-content {
   }
 }
 
+/* ========================================
+   MATERIAL 3 BUTTONS & COMPONENTS
+   Modern button styles with state layers and ripple effects
+   ======================================== */
+
+/* === MATERIAL 3 BUTTON BASE === */
+.m3-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 20px; /* Fully rounded */
+  font-family: var(--font-family-ui);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m3-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+/* === STATE LAYER === */
+.m3-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+}
+
+.m3-btn:hover::before {
+  opacity: var(--md-sys-state-hover-opacity);
+}
+
+.m3-btn:focus::before {
+  opacity: var(--md-sys-state-focus-opacity);
+}
+
+.m3-btn:active::before {
+  opacity: var(--md-sys-state-pressed-opacity);
+}
+
+/* === FILLED BUTTON (Highest emphasis) === */
+.m3-btn-filled {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--md-sys-elevation-0);
+}
+
+.m3-btn-filled:hover {
+  box-shadow: var(--md-sys-elevation-1);
+}
+
+/* === FILLED TONAL BUTTON (Medium-high emphasis) === */
+.m3-btn-tonal {
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  box-shadow: var(--md-sys-elevation-0);
+}
+
+.m3-btn-tonal:hover {
+  box-shadow: var(--md-sys-elevation-1);
+}
+
+/* === OUTLINED BUTTON (Medium emphasis) === */
+.m3-btn-outlined {
+  background-color: transparent;
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline);
+}
+
+/* === TEXT BUTTON (Low emphasis) === */
+.m3-btn-text {
+  background-color: transparent;
+  color: var(--md-sys-color-primary);
+  padding: 10px 12px;
+}
+
+/* === ICON BUTTON === */
+.m3-btn-icon {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* === RIPPLE EFFECT === */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.3;
+  transform: scale(0);
+  animation: ripple-animation var(--md-sys-motion-duration-long2) var(--md-sys-motion-easing-standard) forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  from {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* === FOCUS RING === */
+.m3-btn:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.m3-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* === MATERIAL ICONS === */
 /* Styling for Material Icons font */
 .material-icons {
@@ -1367,7 +1499,7 @@ body .main-content {
   white-space: nowrap;
   direction: ltr;
   vertical-align: middle;
-  
+
   /* Support for all WebKit browsers */
   -webkit-font-smoothing: antialiased;
   /* Support for Safari and Chrome */
