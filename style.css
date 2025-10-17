@@ -33,7 +33,132 @@
  * */
 
     :root {
-      /* === COLOR SYSTEM === */
+      /* ========================================
+         MATERIAL 3 DESIGN TOKENS
+         Light theme by default, dark theme via media query
+         ======================================== */
+
+      /* === MATERIAL 3 COLOR SYSTEM (LIGHT THEME) === */
+      /* Primary colors - Main brand and key actions */
+      --md-sys-color-primary: #6750A4;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #EADDFF;
+      --md-sys-color-on-primary-container: #21005D;
+
+      /* Secondary colors - Supporting actions */
+      --md-sys-color-secondary: #625B71;
+      --md-sys-color-on-secondary: #FFFFFF;
+      --md-sys-color-secondary-container: #E8DEF8;
+      --md-sys-color-on-secondary-container: #1D192B;
+
+      /* Tertiary colors - Complementary accents */
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-tertiary-container: #FFD8E4;
+      --md-sys-color-on-tertiary-container: #31111D;
+
+      /* Surface colors - Backgrounds and elevations */
+      --md-sys-color-surface: #FEF7FF;
+      --md-sys-color-on-surface: #1D1B20;
+      --md-sys-color-surface-variant: #E7E0EC;
+      --md-sys-color-on-surface-variant: #49454F;
+
+      /* Surface elevation levels */
+      --md-sys-color-surface-container-lowest: #FFFFFF;
+      --md-sys-color-surface-container-low: #F7F2FA;
+      --md-sys-color-surface-container: #F3EDF7;
+      --md-sys-color-surface-container-high: #ECE6F0;
+      --md-sys-color-surface-container-highest: #E6E0E9;
+
+      /* Utility colors */
+      --md-sys-color-error: #B3261E;
+      --md-sys-color-on-error: #FFFFFF;
+      --md-sys-color-error-container: #F9DEDC;
+      --md-sys-color-on-error-container: #410E0B;
+      --md-sys-color-outline: #79747E;
+      --md-sys-color-outline-variant: #CAC4D0;
+
+      /* === MATERIAL 3 TYPOGRAPHY SCALE === */
+      /* Display - Largest text, hero sections */
+      --md-sys-typescale-display-large: 400 57px/64px var(--font-family-ui);
+      --md-sys-typescale-display-medium: 400 45px/52px var(--font-family-ui);
+      --md-sys-typescale-display-small: 400 36px/44px var(--font-family-ui);
+
+      /* Headline - High-emphasis, short text */
+      --md-sys-typescale-headline-large: 400 32px/40px var(--font-family-ui);
+      --md-sys-typescale-headline-medium: 400 28px/36px var(--font-family-ui);
+      --md-sys-typescale-headline-small: 400 24px/32px var(--font-family-ui);
+
+      /* Title - Medium-emphasis text */
+      --md-sys-typescale-title-large: 500 22px/28px var(--font-family-ui);
+      --md-sys-typescale-title-medium: 500 16px/24px var(--font-family-ui);
+      --md-sys-typescale-title-small: 500 14px/20px var(--font-family-ui);
+
+      /* Body - Main content text */
+      --md-sys-typescale-body-large: 400 16px/24px var(--font-family-ui);
+      --md-sys-typescale-body-medium: 400 14px/20px var(--font-family-ui);
+      --md-sys-typescale-body-small: 400 12px/16px var(--font-family-ui);
+
+      /* Label - Buttons, tabs, labels */
+      --md-sys-typescale-label-large: 500 14px/20px var(--font-family-ui);
+      --md-sys-typescale-label-medium: 500 12px/16px var(--font-family-ui);
+      --md-sys-typescale-label-small: 500 11px/16px var(--font-family-ui);
+
+      /* Code - Monospace for calculations */
+      --md-sys-typescale-code-medium: 400 14px/20px 'Roboto Mono', monospace;
+
+      /* === MATERIAL 3 ELEVATION === */
+      /* Shadow system for depth */
+      --md-sys-elevation-0: none;
+      --md-sys-elevation-1: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      --md-sys-elevation-2: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+      --md-sys-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px rgba(0, 0, 0, 0.3);
+      --md-sys-elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15), 0px 2px 3px rgba(0, 0, 0, 0.3);
+      --md-sys-elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px rgba(0, 0, 0, 0.3);
+
+      /* === MATERIAL 3 MOTION === */
+      /* Easing curves */
+      --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+      --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+      --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+      --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+      --md-sys-motion-easing-legacy: cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Duration scale */
+      --md-sys-motion-duration-short1: 50ms;
+      --md-sys-motion-duration-short2: 100ms;
+      --md-sys-motion-duration-short3: 150ms;
+      --md-sys-motion-duration-short4: 200ms;
+      --md-sys-motion-duration-medium1: 250ms;
+      --md-sys-motion-duration-medium2: 300ms;
+      --md-sys-motion-duration-medium3: 350ms;
+      --md-sys-motion-duration-medium4: 400ms;
+      --md-sys-motion-duration-long1: 450ms;
+      --md-sys-motion-duration-long2: 500ms;
+      --md-sys-motion-duration-long3: 550ms;
+      --md-sys-motion-duration-long4: 600ms;
+
+      /* === MATERIAL 3 SHAPE === */
+      /* Corner radius scale */
+      --md-sys-shape-corner-none: 0px;
+      --md-sys-shape-corner-extra-small: 4px;
+      --md-sys-shape-corner-small: 8px;
+      --md-sys-shape-corner-medium: 12px;
+      --md-sys-shape-corner-large: 16px;
+      --md-sys-shape-corner-extra-large: 28px;
+      --md-sys-shape-corner-full: 9999px;
+
+      /* === MATERIAL 3 STATE LAYERS === */
+      /* Interaction feedback opacity */
+      --md-sys-state-hover-opacity: 0.08;
+      --md-sys-state-focus-opacity: 0.12;
+      --md-sys-state-pressed-opacity: 0.12;
+      --md-sys-state-dragged-opacity: 0.16;
+
+      /* ========================================
+         LEGACY COLOR SYSTEM (for backwards compatibility)
+         Will be phased out as components migrate to M3
+         ======================================== */
       /* Dark theme colors optimized for long coding sessions */
       --background: #121212;        /* Deep background reduces eye strain */
       --surface: #1E1E1E;          /* Slightly lighter for component backgrounds */
