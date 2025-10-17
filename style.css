@@ -1473,8 +1473,8 @@ body.modal-open {
   overflow-y: hidden;
 }
 
-/* === INDIVIDUAL TAB (Material 3) === */
-/* Single tab representing one open file */
+/* === INDIVIDUAL TAB (Material 3 Expressive) === */
+/* Single tab representing one open file with variable font expressiveness */
 .tab {
   display: flex;
   align-items: center;
@@ -1482,19 +1482,33 @@ body.modal-open {
   background: transparent;
   border: none;
   border-radius: 0;
-  padding: 0 16px;
+  padding: 0 20px;                     /* More generous padding */
   cursor: pointer;
   color: var(--md-sys-color-on-surface-variant);
   font-family: var(--font-family-ui);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 450;                    /* Variable font: lighter inactive weight */
+  font-variation-settings: 'wght' 450; /* Explicit variable font weight */
+  letter-spacing: 0.01em;              /* Subtle tracking for legibility */
   line-height: 20px;
-  transition: color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  transition: color var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
+              font-weight var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
+              font-variation-settings var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
+              letter-spacing var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
+              transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   white-space: nowrap;
-  min-width: 80px;
-  max-width: 180px;
+  min-width: 90px;                     /* Slightly wider for better presence */
+  max-width: 200px;                    /* More room for file names */
   height: 48px;
   position: relative;
+}
+
+/* Hover state with weight change */
+.tab:hover {
+  font-weight: 500;                    /* Slightly heavier on hover */
+  font-variation-settings: 'wght' 500;
+  letter-spacing: 0.015em;             /* Slightly more tracking */
+  transform: translateY(-1px);         /* Subtle lift for expressiveness */
 }
 
 /* State layer for hover */
@@ -1515,13 +1529,24 @@ body.modal-open {
   opacity: var(--md-sys-state-pressed-opacity);
 }
 
-/* === ACTIVE TAB (Material 3) === */
-/* Highlighted tab showing currently open file */
+/* === ACTIVE TAB (Material 3 Expressive) === */
+/* Highlighted tab showing currently open file with bold expressiveness */
 .tab.active {
   color: var(--md-sys-color-primary);
+  font-weight: 650;                    /* Variable font: bold active weight */
+  font-variation-settings: 'wght' 650;
+  letter-spacing: 0.02em;              /* More tracking for emphasis */
+  transform: scale(1.02);              /* Subtle scale up for prominence */
 }
 
-/* Material 3 tab indicator */
+/* Keep hover state for active tabs even more prominent */
+.tab.active:hover {
+  font-weight: 700;                    /* Variable font: even bolder on hover */
+  font-variation-settings: 'wght' 700;
+  transform: scale(1.02) translateY(-1px);
+}
+
+/* Material 3 tab indicator - more prominent */
 .tab::after {
   content: '';
   position: absolute;
@@ -1531,11 +1556,20 @@ body.modal-open {
   height: 3px;
   background-color: var(--md-sys-color-primary);
   transform: scaleX(0);
-  transition: transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized);
+  transform-origin: left;              /* Grow from left for directionality */
+  transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
+              height var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  border-radius: 3px 3px 0 0;         /* Rounded top corners */
 }
 
 .tab.active::after {
   transform: scaleX(1);
+  height: 4px;                         /* Slightly thicker when active */
+}
+
+/* Indicator grows on hover for active tab */
+.tab.active:hover::after {
+  height: 5px;                         /* Even thicker on hover */
 }
 
 /* === DIRTY TAB INDICATOR === */
@@ -1629,12 +1663,25 @@ body.modal-open {
 }
 
 /* === MOBILE TAB OPTIMIZATIONS === */
+/* Maintain expressiveness on smaller screens */
 @media screen and (max-width: 768px) {
   .tab {
-    min-width: 70px;
-    max-width: 140px;
-    padding: var(--space-sm) var(--space-md);
-    font-size: 12px;
+    min-width: 75px;                   /* Slightly wider for touch */
+    max-width: 150px;                  /* More room on mobile */
+    padding: 0 16px;                   /* Adjusted padding */
+    font-size: 13px;                   /* Slightly smaller but still legible */
+    font-weight: 425;                  /* Lighter weight on mobile */
+    font-variation-settings: 'wght' 425;
+  }
+
+  .tab.active {
+    font-weight: 625;                  /* Bold but not too heavy on mobile */
+    font-variation-settings: 'wght' 625;
+  }
+
+  .tab.active:hover {
+    font-weight: 675;
+    font-variation-settings: 'wght' 675;
   }
 
   .tab-bar {
