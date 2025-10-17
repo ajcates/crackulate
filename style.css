@@ -721,6 +721,9 @@
   border-radius: var(--md-sys-shape-corner-full); /* M3 fully rounded */
   font-family: var(--font-family);    /* Consistent monospace font */
   font-size: var(--font-size-small);  /* Compact text size */
+  min-height: 40px;                    /* M3 minimum button height for adequate touch target */
+  display: inline-flex;                /* Flexbox for vertical centering */
+  align-items: center;                 /* Center text vertically */
   transition: transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized), /* Scale animation */
               box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard); /* Shadow animation */
   white-space: nowrap;                 /* Prevent text wrapping */
@@ -1036,35 +1039,76 @@ header {
   overflow-y: auto;
 }
 
+/* === FILE LIST ITEMS === */
+/* List items with M3 dividers */
 .file-list li {
-  margin-bottom: 8px;
+  margin-bottom: 0;                     /* Remove margin for divider spacing */
+  position: relative;
 }
 
+/* M3 divider between file items */
+.file-list li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--md-sys-color-outline-variant); /* M3 subtle divider */
+  opacity: 0.6;
+}
+
+/* Spacing between file items */
+.file-list li + li {
+  margin-top: 8px;
+}
+
+/* === MATERIAL 3 FILLED CARD (File List Items) === */
 .file-button {
+  position: relative;                   /* For state layer positioning */
   width: 100%;
-  background: var(--background);
-  border: 1px solid var(--outline);
-  border-radius: 6px;
+  background-color: var(--md-sys-color-surface-container-highest); /* M3 filled card background */
+  border: none;                        /* No border for filled cards */
+  border-radius: var(--md-sys-shape-corner-medium); /* M3 medium corner radius (12px) */
   padding: 16px 12px;
   cursor: pointer;
-  color: var(--text-primary);
+  color: var(--md-sys-color-on-surface); /* M3 text color */
   text-align: left;
-  font-size: 14px;
-  font-family: var(--font-family);
-  transition: background-color 0.2s ease;
+  font: var(--md-sys-typescale-body-medium); /* M3 typography */
+  transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
+  min-height: 48px;                    /* M3 minimum touch target */
+  overflow: hidden;                     /* Contain state layer */
 }
 
-.file-button:hover, .file-button:active {
-  background: var(--outline);
+/* State layer for file button */
+.file-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--md-sys-color-on-surface);
+  opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+  border-radius: var(--md-sys-shape-corner-medium);
+}
+
+.file-button:hover::before {
+  opacity: var(--md-sys-state-hover-opacity); /* M3 hover state layer (8%) */
+}
+
+.file-button:active::before {
+  opacity: var(--md-sys-state-pressed-opacity); /* M3 pressed state layer (12%) */
 }
 
 .file-button.delete-mode {
-  border-color: #f44336;
-  background: rgba(244, 67, 54, 0.1);
+  background-color: var(--md-sys-color-error-container); /* M3 error container */
+  color: var(--md-sys-color-on-error-container); /* M3 error text color */
+}
+
+.file-button.delete-mode::before {
+  background-color: var(--md-sys-color-on-error-container);
 }
 
 .file-icon {
@@ -1812,9 +1856,48 @@ body .main-content {
 .file-icon.material-icons {
   font-size: 18px;
   color: var(--primary);
+  transition: color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 }
 
 .delete-icon.material-icons {
   font-size: 18px;
   color: #f44336;
+  transition: color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+}
+
+/* === ICON INTERACTION STATES === */
+/* Enhanced hover/active/disabled states for Material Icons */
+
+/* Icon hover state */
+.btn-mobile:hover .material-icons,
+.action-btn:hover .material-icons {
+  color: var(--md-sys-color-primary);
+  transform: scale(1.05);
+  transition: transform var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized),
+              color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+}
+
+/* Icon active state */
+.btn-mobile:active .material-icons,
+.action-btn:active .material-icons {
+  transform: scale(0.95);
+}
+
+/* Icon disabled state */
+.btn-mobile:disabled .material-icons,
+.action-btn:disabled .material-icons,
+button:disabled .material-icons {
+  opacity: 0.38;
+  color: var(--md-sys-color-on-surface);
+}
+
+/* File button icon states */
+.file-button:hover .file-icon.material-icons {
+  color: var(--md-sys-color-primary);
+  transform: scale(1.1);
+}
+
+.file-button.delete-mode:hover .delete-icon.material-icons {
+  color: var(--md-sys-color-error);
+  transform: scale(1.1);
 }
