@@ -48,7 +48,15 @@ export class FileModalView {
     this.#elements.modal.addEventListener('click', (e) => {
       if (e.target === this.#elements.modal) this.close();
     });
-    
+
+    // ESC key to close modal
+    this.#escapeHandler = (e) => {
+      if (e.key === 'Escape' && !this.#elements.modal.classList.contains('hidden')) {
+        this.close();
+      }
+    };
+    document.addEventListener('keydown', this.#escapeHandler);
+
     // Save form events
     this.#elements.saveCancel.addEventListener('click', () => this.close());
     this.#elements.fileNameInput.addEventListener('keypress', (e) => {
@@ -57,7 +65,7 @@ export class FileModalView {
         this.#triggerSaveConfirm();
       }
     });
-    
+
     // Delete mode toggle
     this.#elements.deleteToggle.addEventListener('click', () => {
       this.#toggleDeleteMode();
@@ -254,6 +262,9 @@ export class FileModalView {
    * Clean up event listeners
    */
   destroy() {
+    if (this.#escapeHandler) {
+      document.removeEventListener('keydown', this.#escapeHandler);
+    }
     this.#eventHandlers.clear();
   }
 }

@@ -1901,3 +1901,102 @@ button:disabled .material-icons {
   color: var(--md-sys-color-error);
   transform: scale(1.1);
 }
+
+/* ========================================
+   MATERIAL 3 ACCESSIBILITY - FOCUS INDICATORS
+   Comprehensive keyboard navigation support
+   ======================================== */
+
+/* === FOCUS INDICATORS FOR ALL INTERACTIVE ELEMENTS === */
+/* Material 3 focus rings for keyboard navigation */
+
+/* File buttons */
+.file-button:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.file-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Modal close buttons */
+.modal-close:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.modal-close:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Action buttons */
+.action-btn:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.action-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Tab elements */
+.tab:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.tab:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Tab close buttons */
+.tab-close:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.tab-close:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Tab add button */
+.tab-add-btn:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.tab-add-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Text inputs (.mobile-input already has focus styles via border change) */
+.mobile-input:focus-visible {
+  box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.12); /* M3 focus ring glow */
+}
+
+/* Editor textarea */
+.editor:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px; /* Inset outline for textarea */
+}
+
+/* Notification close button */
+.notification-close:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+.notification-close:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure all buttons have proper focus indication */
+button:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}

@@ -149,6 +149,15 @@ export class EditorController {
       if (e.target === modal) this.#hideLineReferenceModal();
     });
 
+    // ESC key to close
+    const escapeHandler = (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        this.#hideLineReferenceModal();
+      }
+    };
+    document.addEventListener('keydown', escapeHandler);
+    this.#unsubscribers.push(() => document.removeEventListener('keydown', escapeHandler));
+
     // Insert handler
     insertBtn.addEventListener('click', () => this.#handleLineReferenceInsert());
 

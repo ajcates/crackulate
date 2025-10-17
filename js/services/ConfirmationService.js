@@ -38,16 +38,24 @@ export class ConfirmationService {
     this.#elements.yesBtn.addEventListener('click', () => {
       this.#resolve(true);
     });
-    
+
     this.#elements.noBtn.addEventListener('click', () => {
       this.#resolve(false);
     });
-    
+
     this.#modal.addEventListener('click', (e) => {
       if (e.target === this.#modal) {
         this.#resolve(false);
       }
     });
+
+    // ESC key to cancel
+    this.#escapeHandler = (e) => {
+      if (e.key === 'Escape' && !this.#modal.classList.contains('hidden')) {
+        this.#resolve(false);
+      }
+    };
+    document.addEventListener('keydown', this.#escapeHandler);
   }
   
   /**
