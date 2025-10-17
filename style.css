@@ -602,6 +602,31 @@
       padding: 0;
     }
 
+/* === RESULT ELEMENTS === */
+/* Individual calculation results with Material 3 animations */
+.result {
+  opacity: 0;
+  animation: resultSlideIn var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate) forwards;
+}
+
+@keyframes resultSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Error results with M3 error color */
+.result.error {
+  color: var(--md-sys-color-error);
+  font-weight: 500;
+  cursor: help;
+}
+
 /* === VARIABLE TOOLBAR === */
 /* Fixed bottom toolbar that adapts to mobile keyboard visibility */
 #variable-toolbar {
@@ -682,9 +707,10 @@
   }
 }
 
-/* === VARIABLE BUTTONS === */
-/* Dynamic buttons for each user-defined variable */
+/* === VARIABLE BUTTONS (Material 3) === */
+/* Dynamic buttons for each user-defined variable with M3 micro-interactions */
 #variable-toolbar button {
+  position: relative;                  /* For state layer positioning */
   color: var(--text-primary);         /* High contrast text */
   background: linear-gradient(180deg, var(--accent), var(--accent-dark)); /* Distinctive gradient */
   border: 1px solid var(--outline);   /* Subtle border */
@@ -692,16 +718,56 @@
   cursor: pointer;                     /* Indicate interactive element */
   margin-right: var(--space-md);      /* Space between buttons */
   margin-bottom: var(--space-md);     /* Space for wrapped rows */
-  border-radius: 20px;                /* Pill shape for variable distinction */
+  border-radius: var(--md-sys-shape-corner-full); /* M3 fully rounded */
   font-family: var(--font-family);    /* Consistent monospace font */
   font-size: var(--font-size-small);  /* Compact text size */
-  transition: var(--transition-fast);  /* Quick hover response */
+  transition: transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized), /* Scale animation */
+              box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard); /* Shadow animation */
   white-space: nowrap;                 /* Prevent text wrapping */
+  overflow: hidden;                    /* Contain state layer */
+  user-select: none;                   /* Prevent text selection */
+  box-shadow: var(--md-sys-elevation-1); /* Subtle elevation */
 }
 
-/* === VARIABLE BUTTON INTERACTION === */
+/* === STATE LAYER === */
+/* Semi-transparent overlay for interaction feedback */
+#variable-toolbar button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.2); /* Light overlay */
+  opacity: 0;
+  border-radius: var(--md-sys-shape-corner-full);
+  transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+}
+
+/* === VARIABLE BUTTON INTERACTION STATES === */
 #variable-toolbar button:hover {
-  opacity: 0.8;                        /* Subtle transparency on hover */
+  transform: translateY(-2px);         /* Lift on hover */
+  box-shadow: var(--md-sys-elevation-2); /* Increased elevation */
+}
+
+#variable-toolbar button:hover::before {
+  opacity: 1;                          /* Show state layer */
+}
+
+#variable-toolbar button:active {
+  transform: translateY(0) scale(0.96); /* Press down and scale */
+  box-shadow: var(--md-sys-elevation-1); /* Reduce elevation when pressed */
+}
+
+#variable-toolbar button:active::before {
+  opacity: 0.5;                        /* Dim state layer on press */
+}
+
+/* === FOCUS STATE === */
+#variable-toolbar button:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary); /* M3 focus ring */
+  outline-offset: 2px;
+}
+
+#variable-toolbar button:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* === PAGE LAYOUT SYSTEM === */
@@ -1121,7 +1187,8 @@ header {
   border-color: var(--md-sys-color-outline-variant);
 }
 
-/* Simple Notifications */
+/* === NOTIFICATIONS (Material 3) === */
+/* Toast-style notifications with M3 motion */
 .notification {
   position: fixed;
   top: 70px;
@@ -1131,20 +1198,32 @@ header {
   background: var(--surface);
   color: var(--text-primary);
   padding: 12px 40px 12px 16px;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: var(--md-sys-shape-corner-small);
+  box-shadow: var(--md-sys-elevation-3);
   z-index: 9999;
   opacity: 0;
-  transition: all 0.3s ease;
-  font-size: 14px;
+  transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate),
+              opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
+  font: var(--md-sys-typescale-body-medium);
   text-align: center;
   margin: 0 auto;
-  position: relative;
 }
 
 .notification.show {
   transform: translateY(0);
   opacity: 1;
+  animation: notificationSlideIn var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
+}
+
+@keyframes notificationSlideIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .notification-success {
