@@ -22,6 +22,7 @@ import { TabService } from './services/TabService.js';
 
 // Utils
 import { AppTitleHandler } from './utils/AppTitleHandler.js';
+import { RippleEffect } from './utils/RippleEffect.js';
 
 /**
  * Main Application Class
@@ -125,6 +126,9 @@ export class Application {
     // App title handler - makes title editable and persists changes
     const appTitleHandler = new AppTitleHandler();
     this.#container.registerInstance('appTitleHandler', appTitleHandler);
+
+    // Material 3 ripple effects for toolbar buttons
+    RippleEffect.init('.btn-mobile');
   }
 
   /**

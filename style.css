@@ -798,14 +798,16 @@ header {
   padding-bottom: var(--toolbar-height); /* Space for fixed variable toolbar */
 }
 
-/* === FILE OPERATIONS TOOLBAR === */
-/* Compact mobile-first toolbar for file operations */
+/* === FILE OPERATIONS TOOLBAR (Material 3 Expressive) === */
+/* Top app bar with M3 elevated design and expressive motion */
 .mobile-toolbar {
-  background-color: var(--background); /* Base background - no elevation */
+  background-color: var(--md-sys-color-surface-container); /* M3 elevated surface */
   border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
   padding: var(--space-sm) var(--space-md); /* Compact but touch-friendly */
   height: var(--header-height);        /* Fixed height for calculations */
-  box-shadow: none; /* No shadow on base level */
+  box-shadow: var(--md-sys-elevation-2); /* M3 subtle elevation for hierarchy */
+  position: relative;                  /* For potential state layers */
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
 /* === TOOLBAR LAYOUT === */
@@ -925,53 +927,82 @@ header {
   50% { opacity: 0.5; }
 }
 
-/* === MOBILE FILE OPERATION BUTTONS === */
-/* Compact touch-friendly buttons for file operations */
+/* === MATERIAL 3 ICON BUTTONS (Expressive Toolbar) === */
+/* Standard icon buttons with expressive motion and ripple support */
 .btn-mobile {
-  position: relative;                    /* For state layer positioning */
+  position: relative;                    /* For state layer and ripple positioning */
   background: transparent;               /* Transparent background */
   border: none;                          /* No border */
   border-radius: 50%;                    /* Circular icon button */
-  padding: 12px;                         /* M3 icon button padding */
+  padding: 12px;                         /* M3 icon button padding (48px total) */
   font-size: 20px;                       /* Icon size */
   cursor: pointer;                       /* Indicate interactive element */
   color: var(--md-sys-color-on-surface-variant); /* M3 icon color */
-  transition: background-color var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
-  width: 48px;                           /* M3 icon button size */
-  height: 48px;                          /* M3 icon button size */
+  width: 48px;                           /* M3 standard icon button size */
+  height: 48px;                          /* M3 standard icon button size */
   display: flex;                         /* Center icon content */
   align-items: center;                   /* Vertical centering */
   justify-content: center;               /* Horizontal centering */
-  overflow: hidden;                      /* Contain state layer */
+  overflow: hidden;                      /* Contain state layer and ripple */
+  transition: color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized),
+              transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-emphasized);
+  -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
 }
 
-/* State layer for toolbar buttons */
+/* === M3 STATE LAYER === */
+/* Semi-transparent overlay for hover/focus/press feedback */
 .btn-mobile::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-on-surface); /* State layer color */
   opacity: 0;
-  border-radius: 50%;
+  border-radius: 50%;                    /* Match button shape */
   transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+  pointer-events: none;                  /* Don't interfere with clicks */
 }
 
-/* === BUTTON INTERACTION STATES === */
+/* === EXPRESSIVE INTERACTION STATES === */
+/* Hover: Subtle elevation and color change */
+.btn-mobile:hover {
+  color: var(--md-sys-color-on-surface); /* Darker icon on hover */
+  transform: scale(1.05);                /* Subtle grow on hover */
+}
+
 .btn-mobile:hover::before {
-  opacity: var(--md-sys-state-hover-opacity); /* M3 state layer */
+  opacity: var(--md-sys-state-hover-opacity); /* M3 hover state (8%) */
+}
+
+/* Active/Pressed: Scale down with strong state layer */
+.btn-mobile:active {
+  transform: scale(0.92);                /* Expressive press animation */
+  transition-duration: var(--md-sys-motion-duration-short1); /* Faster press response */
 }
 
 .btn-mobile:active::before {
-  opacity: var(--md-sys-state-pressed-opacity); /* M3 pressed state */
+  opacity: var(--md-sys-state-pressed-opacity); /* M3 pressed state (12%) */
 }
 
+/* Focus: Accessible keyboard navigation */
 .btn-mobile:focus-visible {
   outline: 2px solid var(--md-sys-color-primary); /* M3 focus ring */
   outline-offset: 2px;                   /* Space around focus ring */
+  color: var(--md-sys-color-primary);    /* Accent color on focus */
 }
 
 .btn-mobile:focus:not(:focus-visible) {
-  outline: none;
+  outline: none;                         /* Hide focus ring for mouse users */
+}
+
+/* Disabled state */
+.btn-mobile:disabled {
+  opacity: 0.38;                         /* M3 disabled opacity */
+  cursor: not-allowed;                   /* Show disabled cursor */
+  transform: none;                       /* No hover effects */
+}
+
+.btn-mobile:disabled::before {
+  display: none;                         /* No state layer when disabled */
 }
 
 /* === MODAL SYSTEM === */
