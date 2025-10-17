@@ -6,7 +6,8 @@
   <meta name="description" content="...">
   <link rel="manifest" href="manifest.json">
   <title>Crackulator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 </head>
@@ -14,16 +15,14 @@
   <header>
     <div class="mobile-toolbar">
       <div class="toolbar-row">
-        <div class="file-actions">
-          <button id="new" class="btn-mobile" title="New">📄</button>
-          <button id="open" class="btn-mobile" title="Open">📂</button>
-          <button id="save" class="btn-mobile" title="Save">💾</button>
-          <button id="share" class="btn-mobile" title="Share">🔗</button>
-          <button id="undo" class="btn-mobile" title="Undo">↶</button>
-        </div>
         <div class="file-status">
           <span id="current-file-name">Untitled</span>
           <span id="save-status" class="save-indicator hidden">●</span>
+        </div>
+        <div class="file-actions">
+          <button id="line-ref" class="btn-mobile" title="Insert Line Reference"><span class="material-icons">tag</span></button>
+          <button id="share" class="btn-mobile" title="Share"><span class="material-icons">share</span></button>
+          <button id="undo" class="btn-mobile" title="Undo"><span class="material-icons">undo</span></button>
         </div>
       </div>
     </div>
@@ -47,7 +46,7 @@
             <p>No files saved yet</p>
           </div>
           <div class="modal-actions">
-            <button class="action-btn delete-btn" id="delete-mode-toggle">🗑️ Delete</button>
+            <button class="action-btn delete-btn" id="delete-mode-toggle"><span class="material-icons">delete</span> Delete</button>
           </div>
         </div>
         
@@ -74,6 +73,24 @@
         <div class="modal-actions">
           <button class="action-btn confirm-btn" id="confirm-yes">Yes</button>
           <button class="action-btn cancel-btn" id="confirm-no">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Line Reference Modal -->
+  <div class="modal-overlay hidden" id="line-ref-modal">
+    <div class="mobile-modal small">
+      <div class="modal-header">
+        <h3 id="line-ref-title">Insert Line Reference</h3>
+        <button class="modal-close" id="line-ref-close">×</button>
+      </div>
+      <div class="modal-content">
+        <p>Enter line number:</p>
+        <input type="number" id="line-ref-input" class="mobile-input" placeholder="e.g., 3" min="1" />
+        <div class="modal-actions">
+          <button class="action-btn save-btn" id="line-ref-insert">Insert</button>
+          <button class="action-btn cancel-btn" id="line-ref-cancel">Cancel</button>
         </div>
       </div>
     </div>

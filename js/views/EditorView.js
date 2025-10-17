@@ -5,7 +5,8 @@
 export class EditorView {
   #elements;
   #eventHandlers = new Map();
-  
+  #savedCursorPosition = null;
+
   constructor(container) {
     this.#elements = this.#initializeElements(container);
     this.#bindInternalEvents();
@@ -216,17 +217,77 @@ export class EditorView {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
     const value = editor.value;
-    
+
     const newValue = value.substring(0, start) + variable + value.substring(end);
     editor.value = newValue;
-    
+
     // Position cursor after inserted variable
     const newCursorPos = start + variable.length;
     editor.setSelectionRange(newCursorPos, newCursorPos);
     editor.focus();
-    
+
     // Trigger input event to update calculations
     editor.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  /**
+   * Save current cursor position
+   */
+  saveCursorPosition() {
+    this.#savedCursorPosition = {
+      start: this.#elements.editor.selectionStart,
+      end: this.#elements.editor.selectionEnd
+    };
+  }
+
+  /**
+   * Insert text at saved cursor position
+   * @param {string} text - Text to insert
+   */
+  insertAtSavedPosition(text) {
+    if (!this.#savedCursorPosition) {
+      console.warn('No saved cursor position');
+      return;
+    }
+
+    const editor = this.#elements.editor;
+    const value = editor.value;
+    const { start, end } = this.#savedCursorPosition;
+
+    const newValue = value.substring(0, start) + text + value.substring(end);
+    editor.value = newValue;
+
+    // Position cursor after inserted text
+    const newCursorPos = start + text.length;
+    editor.setSelectionRange(newCursorPos, newCursorPos);
+    editor.focus();
+
+    // Clear saved position
+    this.#savedCursorPosition = null;
+
+    // Trigger input event to update calculations
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  /**
+   * Register line reference button click handler
+   * @param {Function} callback - Click callback function
+   * @returns {Function} Cleanup function
+   */
+  onLineReferenceClick(callback) {
+    const button = document.getElementById('line-ref');
+    if (!button) {
+      console.warn('Line reference button not found');
+      return () => {};
+    }
+
+    button.addEventListener('click', callback);
+    this.#eventHandlers.set('lineRefClick', callback);
+
+    return () => {
+      button.removeEventListener('click', callback);
+      this.#eventHandlers.delete('lineRefClick');
+    };
   }
   
   /**

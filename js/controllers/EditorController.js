@@ -24,19 +24,23 @@ export class EditorController {
     // Bind view events
     this.#unsubscribers.push(
       this.#view.onInput(this.#handleInput.bind(this)),
-      this.#view.onScroll(this.#handleScroll.bind(this))
+      this.#view.onScroll(this.#handleScroll.bind(this)),
+      this.#view.onLineReferenceClick(this.#handleLineReferenceClick.bind(this))
     );
-    
+
     // Subscribe to state changes
     this.#unsubscribers.push(
       this.#state.subscribe(this.#handleStateChange.bind(this))
     );
-    
+
     // Subscribe to undo events
     this.#unsubscribers.push(
       eventBus.subscribe('editor:undo', this.#handleUndo.bind(this))
     );
-    
+
+    // Bind line reference modal events
+    this.#bindLineReferenceModal();
+
     // Initialize view with current state
     this.#initializeView();
   }
@@ -101,26 +105,124 @@ export class EditorController {
    */
   async #handleUndo() {
     const history = this.#state.getState('history');
-    
+
     if (history.length > 1) {
       // Remove current state and get previous one
       const newHistory = [...history];
       newHistory.pop(); // Remove current state
       const previousContent = newHistory[newHistory.length - 1];
-      
+
       // Update state with previous content
       await this.#state.setState({
         'editor.content': previousContent,
         'history': newHistory,
         'ui.hasUnsavedChanges': true
       });
-      
+
       // Update view
       this.#view.setContent(previousContent);
-      
+
       // Recalculate results
       await this.#calculateResults(previousContent);
     }
+  }
+
+  /**
+   * Bind line reference modal events
+   */
+  #bindLineReferenceModal() {
+    const modal = document.getElementById('line-ref-modal');
+    const closeBtn = document.getElementById('line-ref-close');
+    const cancelBtn = document.getElementById('line-ref-cancel');
+    const insertBtn = document.getElementById('line-ref-insert');
+    const input = document.getElementById('line-ref-input');
+
+    if (!modal || !closeBtn || !cancelBtn || !insertBtn || !input) {
+      console.warn('Line reference modal elements not found');
+      return;
+    }
+
+    // Close modal handlers
+    closeBtn.addEventListener('click', () => this.#hideLineReferenceModal());
+    cancelBtn.addEventListener('click', () => this.#hideLineReferenceModal());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) this.#hideLineReferenceModal();
+    });
+
+    // Insert handler
+    insertBtn.addEventListener('click', () => this.#handleLineReferenceInsert());
+
+    // Enter key to insert
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.#handleLineReferenceInsert();
+      }
+    });
+  }
+
+  /**
+   * Handle line reference button click
+   */
+  #handleLineReferenceClick() {
+    // Save the current cursor position
+    this.#view.saveCursorPosition();
+
+    // Show the modal
+    this.#showLineReferenceModal();
+  }
+
+  /**
+   * Show line reference modal
+   */
+  #showLineReferenceModal() {
+    const modal = document.getElementById('line-ref-modal');
+    const input = document.getElementById('line-ref-input');
+
+    if (!modal || !input) return;
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    // Clear and focus input
+    input.value = '';
+    setTimeout(() => input.focus(), 100);
+  }
+
+  /**
+   * Hide line reference modal
+   */
+  #hideLineReferenceModal() {
+    const modal = document.getElementById('line-ref-modal');
+
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  /**
+   * Handle line reference insert
+   */
+  #handleLineReferenceInsert() {
+    const input = document.getElementById('line-ref-input');
+
+    if (!input) return;
+
+    const lineNumber = parseInt(input.value, 10);
+
+    // Validate line number
+    if (isNaN(lineNumber) || lineNumber < 1) {
+      input.value = '';
+      input.focus();
+      return;
+    }
+
+    // Insert the line reference at saved position
+    this.#view.insertAtSavedPosition(`#${lineNumber}`);
+
+    // Hide the modal
+    this.#hideLineReferenceModal();
   }
   
   /**
