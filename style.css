@@ -802,7 +802,7 @@ header {
 /* === FILE OPERATIONS TOOLBAR === */
 /* Compact mobile-first toolbar for file operations */
 .mobile-toolbar {
-  background-color: var(--md-sys-color-surface-container-low); /* Material 3 surface */
+  background-color: var(--md-sys-color-surface-container-lowest); /* Material 3 surface - lowest elevation */
   border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
   padding: var(--space-sm) var(--space-md); /* Compact but touch-friendly */
   height: var(--header-height);        /* Fixed height for calculations */
@@ -1381,8 +1381,8 @@ body.modal-open {
 .tab-bar {
   display: flex;
   align-items: center;
-  background-color: var(--background);
-  border-bottom: 1px solid var(--outline);
+  background-color: var(--md-sys-color-surface-container-low); /* Material 3 surface - slightly higher than toolbar */
+  border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
   padding: var(--space-sm) var(--space-md);
   overflow-x: auto;
   overflow-y: hidden;
