@@ -174,7 +174,15 @@ export class Application {
         await eventBus.emit('editor:undo');
       });
     }
-    
+
+    // Handle new tab button
+    const newTabBtn = document.getElementById('new-tab');
+    if (newTabBtn) {
+      newTabBtn.addEventListener('click', async () => {
+        await eventBus.emit('file:new');
+      });
+    }
+
     // Handle share button
     const shareBtn = document.getElementById('share');
     if (shareBtn) {
