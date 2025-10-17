@@ -5,7 +5,8 @@ export class FileModalView {
   #elements;
   #eventHandlers = new Map();
   #deleteMode = false;
-  
+  #escapeHandler;
+
   constructor() {
     this.#elements = this.#initializeElements();
     this.#bindInternalEvents();

@@ -6,7 +6,8 @@ export class ConfirmationService {
   #modal;
   #elements;
   #currentResolver = null;
-  
+  #escapeHandler;
+
   constructor() {
     this.#initializeModal();
   }
