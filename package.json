@@ -16,7 +16,7 @@
   },
   "git": {
     "scripts": {
-      "pre-push": "surge --project ./ --domain crackulator.surge.sh"
+      "pre-push": "surge --project ./ --domain crackulate.surge.sh"
     }
   }
 }
