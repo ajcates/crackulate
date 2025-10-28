@@ -40,12 +40,20 @@ export class EditorView {
    */
   #bindInternalEvents() {
     // Auto-sync scrolling between editor, results, and line numbers
+    // Optimized: Use requestAnimationFrame for smooth 60fps scrolling
+    let scrolling = false;
     this.#elements.editor.addEventListener('scroll', () => {
-      const { scrollTop } = this.#elements.editor;
-      this.#elements.results.scrollTop = scrollTop;
-      this.#elements.lineNumbers.scrollTop = scrollTop;
-    });
-    
+      if (!scrolling) {
+        scrolling = true;
+        requestAnimationFrame(() => {
+          const { scrollTop } = this.#elements.editor;
+          this.#elements.results.scrollTop = scrollTop;
+          this.#elements.lineNumbers.scrollTop = scrollTop;
+          scrolling = false;
+        });
+      }
+    }, { passive: true });
+
     // Handle mobile keyboard visibility
     if (this.#isMobile()) {
       this.#setupMobileKeyboardHandling();
@@ -150,24 +158,65 @@ export class EditorView {
   
   /**
    * Update calculation results display
+   * Enhanced with better error messages and formatting
    * @param {Array} results - Array of calculation results
    */
   updateResults(results) {
-    const resultElements = results.map(result => {
+    const resultElements = results.map((result, index) => {
       const div = document.createElement('div');
       div.className = `result ${result.type || 'default'}`;
-      
+
       if (result.type === 'error') {
-        div.textContent = 'e';
-        div.title = result.error || 'Calculation error';
+        div.textContent = '!';
+        // Enhanced error tooltip with more context
+        const errorMsg = result.error || 'Calculation error';
+        const lineNum = result.line || index + 1;
+        div.title = `Error on line ${lineNum}: ${errorMsg}`;
+        // Add subtle shake animation on error
+        div.style.animation = 'none';
+        requestAnimationFrame(() => {
+          div.style.animation = 'errorPulse 300ms ease-out';
+        });
+      } else if (result.type === 'empty') {
+        // Use non-breaking space to maintain line height alignment
+        div.innerHTML = '&nbsp;';
+        div.className = 'result empty';
       } else {
-        div.textContent = result.value ?? '';
+        // Format large numbers with commas for readability
+        const formattedValue = this.#formatNumber(result.value);
+        div.textContent = formattedValue;
+        // Add title with full precision for long numbers
+        if (formattedValue !== result.value && result.value) {
+          div.title = `Full value: ${result.value}`;
+        }
       }
-      
+
       return div.outerHTML;
     });
-    
+
     this.#elements.results.innerHTML = resultElements.join('');
+  }
+
+  /**
+   * Format number with commas for readability
+   * @param {string|number} value - Number to format
+   * @returns {string} Formatted number
+   */
+  #formatNumber(value) {
+    if (!value || value === '-' || value === '') return value;
+
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+
+    // For large numbers, add thousand separators
+    if (Math.abs(num) >= 1000) {
+      return num.toLocaleString('en-US', {
+        maximumFractionDigits: 10,
+        useGrouping: true
+      });
+    }
+
+    return value;
   }
   
   /**

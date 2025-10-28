@@ -123,8 +123,9 @@ export class Application {
    * Initialize utility handlers
    */
   async #initializeUtilityHandlers() {
-    // App title handler - makes title editable and persists changes
-    const appTitleHandler = new AppTitleHandler();
+    // App title handler - makes title editable and syncs with active tab
+    const appState = this.#container.resolve('appState');
+    const appTitleHandler = new AppTitleHandler(appState);
     this.#container.registerInstance('appTitleHandler', appTitleHandler);
 
     // Material 3 ripple effects for toolbar buttons
@@ -183,7 +184,7 @@ export class Application {
     const newTabBtn = document.getElementById('new-tab');
     if (newTabBtn) {
       newTabBtn.addEventListener('click', async () => {
-        await eventBus.emit('file:new');
+        await eventBus.emit('tab:create');
       });
     }
 
@@ -355,7 +356,7 @@ export class Application {
       
       // If still no content, use default
       if (!contentToLoad) {
-        contentToLoad = 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2';
+        contentToLoad = '10 + 5\n20 * 3\nprice = 50\nqty = 10\ntotal = price * qty\ntax = total * 0.1\nprofit = #5 - tax';
         filename = 'Untitled';
       }
       
@@ -371,7 +372,7 @@ export class Application {
       // Fall back to default state
       const appState = this.#container.resolve('appState');
       await appState.setState({
-        'editor.content': 'foo = 1+1\n5\nbar = 1\nfoobar = foo + bar + #2',
+        'editor.content': '10 + 5\n20 * 3\nprice = 50\nqty = 10\ntotal = price * qty\ntax = total * 0.1\nprofit = #5 - tax',
         'currentFile': 'Untitled'
       });
     }
@@ -405,9 +406,9 @@ export class Application {
    */
   async shutdown() {
     if (!this.#isInitialized) return;
-    
+
     console.log('Shutting down application...');
-    
+
     try {
       // Clean up controllers
       this.#controllers.forEach(controller => {
@@ -415,17 +416,23 @@ export class Application {
           controller.destroy();
         }
       });
-      
+
+      // Clean up utility handlers
+      const appTitleHandler = this.#container.resolve('appTitleHandler');
+      if (appTitleHandler?.destroy) {
+        appTitleHandler.destroy();
+      }
+
       // Clear event bus
       eventBus.clear();
-      
+
       // Clear container
       this.#container.clear();
-      
+
       this.#isInitialized = false;
-      
+
       console.log('Application shutdown complete');
-      
+
     } catch (error) {
       console.error('Error during shutdown:', error);
     }

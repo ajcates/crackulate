@@ -71,24 +71,34 @@ export class EditorController {
   
   /**
    * Handle editor input with debouncing
+   * Optimized: Reduced debounce to 200ms for more responsive feel
    */
   async #handleInput(content) {
-    // Add to history for undo functionality
+    // Add to history for undo functionality (throttled)
     const currentHistory = this.#state.getState('history');
-    const newHistory = [...currentHistory, content];
-    
+    const lastEntry = currentHistory[currentHistory.length - 1];
+
+    // Only add to history if content changed significantly (prevents history spam)
+    let newHistory = currentHistory;
+    if (content !== lastEntry && currentHistory.length < 100) {
+      newHistory = [...currentHistory, content];
+    } else if (currentHistory.length >= 100) {
+      // Keep history size manageable
+      newHistory = [...currentHistory.slice(1), content];
+    }
+
     // Update state immediately for responsive UI
     await this.#state.setState({
       'editor.content': content,
       'ui.hasUnsavedChanges': true,
       'history': newHistory
     });
-    
-    // Debounce calculations for performance
+
+    // Debounce calculations for performance (reduced to 200ms for better responsiveness)
     clearTimeout(this.#debounceTimer);
     this.#debounceTimer = setTimeout(async () => {
       await this.#calculateResults(content);
-    }, 300);
+    }, 200);
   }
   
   /**

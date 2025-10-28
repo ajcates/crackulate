@@ -175,23 +175,23 @@
       --line-height: 1.5;          /* Optimal for code readability */
 
       /* === SPACING SYSTEM === */
-      /* Consistent spacing scale for layout harmony */
-      --space-xs: 4px;             /* Tiny spacing (borders, fine adjustments) */
-      --space-sm: 6px;             /* Small spacing (button gaps, compact layouts) */
-      --space-md: 8px;             /* Medium spacing (default padding, margins) */
-      --space-lg: 12px;            /* Large spacing (component padding) */
-      --space-xl: 16px;            /* Extra large spacing (section separation) */
-      --space-xxl: 20px;           /* Maximum spacing (modal padding) */
+      /* M3 spacing scale: 4px base unit (4, 8, 12, 16, 24) */
+      --space-xs: 4px;             /* M3 4dp unit - minimal spacing */
+      --space-sm: 8px;             /* M3 8dp unit - compact spacing */
+      --space-md: 12px;            /* M3 12dp unit - default spacing */
+      --space-lg: 16px;            /* M3 16dp unit - comfortable spacing */
+      --space-xl: 16px;            /* M3 16dp unit - section spacing */
+      --space-xxl: 24px;           /* M3 24dp unit - large section spacing */
 
       /* === SIZING SYSTEM === */
-      /* Touch-friendly sizes following mobile design guidelines */
-      --touch-target-sm: 40px;     /* Minimum touch target for compact UI */
-      --touch-target-md: 44px;     /* Standard touch target (Apple/Google guidelines) */
-      --touch-target-lg: 48px;     /* Large touch target for important actions */
+      /* M3 touch targets: 48dp standard for all interactive elements */
+      --touch-target-sm: 40px;     /* Compact touch target for dense layouts */
+      --touch-target-md: 44px;     /* Standard touch target (iOS minimum) */
+      --touch-target-lg: 48px;     /* M3 standard touch target (48dp) */
 
       /* === LAYOUT DIMENSIONS === */
-      /* Specific measurements for layout components */
-      --header-height: 52px;       /* Fixed header height for layout calculations */
+      /* M3 Top App Bar and layout measurements */
+      --header-height: 64px;       /* M3 Top App Bar: 64px desktop, 56px mobile */
       --toolbar-height: 60px;      /* Variable toolbar height at bottom */
       --line-numbers-width: 40px;  /* Fixed width for line number column */
       --results-width: 120px;      /* Fixed width for results column */
@@ -345,15 +345,16 @@
       font-size: var(--font-size);
     }
 
-    header button {
+    /* Legacy button styles - kept for backward compatibility but overridden by .btn-mobile */
+    header button:not(.btn-mobile) {
       background-color: var(--primary);
-      border-radius: var(--border-radius); /* Rounded corners */
-      background: linear-gradient(180deg, var(--primary),var(--primary-dark)); /* Subtle gradient */
-      text-shadow: 0px -1px 0px rgba(255,255,255, 0.3); /* Subtle text shadow */
-      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1); /* Subtle inset shadow */
+      border-radius: var(--border-radius);
+      background: linear-gradient(180deg, var(--primary),var(--primary-dark));
+      text-shadow: 0px -1px 0px rgba(255,255,255, 0.3);
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
       border: 1px solid var(--outline);
       font-weight: medium;
-      color: rgba(0,0,0,0.9); /* Slightly transparent white */
+      color: rgba(0,0,0,0.9);
       border: none;
       padding: var(--half-padding) var(--padding);
       cursor: pointer;
@@ -361,22 +362,22 @@
       transition: opacity 0.3s ease;
     }
 
-    header button:focus {
-      outline: none; /* Remove focus outline */
+    header button:not(.btn-mobile):focus {
+      outline: none;
     }
-    header button:active {
-      opacity: 0.6; /* Slightly darker when clicked */
+    header button:not(.btn-mobile):active {
+      opacity: 0.6;
     }
-    header button:focus-visible {
-      outline: 2px solid var(--primary); /* Visible focus outline */
-      outline-offset: 2px; /* Offset for better visibility */
+    header button:not(.btn-mobile):focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
-    header button:focus:not(:focus-visible) {
-      outline: none; /* Remove focus outline when not focused */
+    header button:not(.btn-mobile):focus:not(:focus-visible) {
+      outline: none;
     }
-    header button:hover {
+    header button:not(.btn-mobile):hover {
       background-color: var(--primary);
-      opacity: 0.9; /* Slightly lighter on hover */
+      opacity: 0.9;
     }
 
     /* Modal styling */
@@ -572,6 +573,13 @@
       resize: none;                       /* Prevent manual resizing */
       border: none;                       /* Clean appearance */
       outline: none;                      /* Remove focus outline */
+      transition: background-color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+      will-change: scroll-position;       /* Optimize for smooth scrolling */
+    }
+
+    /* Editor focus state - subtle highlight */
+    .editor:focus {
+      background-color: color-mix(in srgb, var(--md-sys-color-surface), var(--md-sys-color-primary) 2%);
     }
 
     /* === RESULTS COLUMN === */
@@ -593,6 +601,7 @@
       padding: var(--space-md);          /* Match editor padding */
       scroll-behavior: smooth;            /* Smooth scrolling when synced */
       flex: 0 0 var(--results-width);    /* Fixed width, no grow/shrink */
+      will-change: scroll-position;       /* Optimize for smooth scrolling */
     }
     /* Results pane on the right */
 	
@@ -607,6 +616,7 @@
 .result {
   opacity: 0;
   animation: resultSlideIn var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate) forwards;
+  transition: color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
 }
 
 @keyframes resultSlideIn {
@@ -625,6 +635,17 @@
   color: var(--md-sys-color-error);
   font-weight: 500;
   cursor: help;
+  animation: errorPulse var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized);
+}
+
+/* Error pulse animation for better visibility */
+@keyframes errorPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* === VARIABLE TOOLBAR === */
@@ -724,11 +745,32 @@
   min-height: 32px;                    /* M3 chip height (smaller than buttons) */
   display: inline-flex;                /* Flexbox for vertical centering */
   align-items: center;                 /* Center text vertically */
-  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard); /* Only shadow animation */
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+              transform var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard); /* Smooth animations */
   white-space: nowrap;                 /* Prevent text wrapping */
   overflow: hidden;                    /* Contain state layer */
   user-select: none;                   /* Prevent text selection */
   box-shadow: none;                    /* Chips are flat by default */
+  animation: chipSlideIn var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized-decelerate) backwards;
+}
+
+/* Stagger animation for variable chips */
+#variable-toolbar button:nth-child(1) { animation-delay: 0ms; }
+#variable-toolbar button:nth-child(2) { animation-delay: 30ms; }
+#variable-toolbar button:nth-child(3) { animation-delay: 60ms; }
+#variable-toolbar button:nth-child(4) { animation-delay: 90ms; }
+#variable-toolbar button:nth-child(5) { animation-delay: 120ms; }
+#variable-toolbar button:nth-child(n+6) { animation-delay: 150ms; }
+
+@keyframes chipSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* === STATE LAYER === */
@@ -745,16 +787,19 @@
 
 /* === CHIP INTERACTION STATES (M3) === */
 /* Chips use subtle state layers instead of lifts */
-#variable-toolbar button:hover {
-  box-shadow: var(--md-sys-elevation-1); /* Subtle elevation on hover */
-}
+@media (hover: hover) and (pointer: fine) {
+  #variable-toolbar button:hover {
+    box-shadow: var(--md-sys-elevation-1); /* Subtle elevation on hover */
+    transform: translateY(-1px);         /* Subtle lift on hover */
+  }
 
-#variable-toolbar button:hover::before {
-  opacity: var(--md-sys-state-hover-opacity); /* M3 hover state layer (8%) */
+  #variable-toolbar button:hover::before {
+    opacity: var(--md-sys-state-hover-opacity); /* M3 hover state layer (8%) */
+  }
 }
 
 #variable-toolbar button:active {
-  transform: scale(0.96);              /* Subtle press scale only */
+  transform: scale(0.96) translateY(0); /* Subtle press scale */
   box-shadow: none;                    /* Remove elevation when pressed */
 }
 
@@ -798,43 +843,45 @@ header {
   padding-bottom: var(--toolbar-height); /* Space for fixed variable toolbar */
 }
 
-/* === FILE OPERATIONS TOOLBAR (Material 3 Expressive) === */
-/* Top app bar with M3 elevated design and expressive motion */
+/* === FILE OPERATIONS TOOLBAR (Material 3 Top App Bar) === */
+/* Follows M3 specification: https://m3.material.io/components/top-app-bar */
 .mobile-toolbar {
-  background-color: var(--md-sys-color-surface-container); /* M3 elevated surface */
-  border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
-  padding: var(--space-sm) var(--space-md); /* Compact but touch-friendly */
-  height: var(--header-height);        /* Fixed height for calculations */
-  box-shadow: var(--md-sys-elevation-2); /* M3 subtle elevation for hierarchy */
-  position: relative;                  /* For potential state layers */
+  background-color: var(--md-sys-color-surface-container-low); /* M3 elevated surface */
+  border-bottom: none;                 /* M3 spec: no border, use elevation */
+  padding: 0;                          /* M3 spec: no padding on container */
+  height: var(--header-height);        /* M3 spec: 64px desktop, 56px mobile */
+  box-shadow: var(--md-sys-elevation-2); /* M3 elevation level 2 for prominence */
+  position: relative;                  /* For state layers */
   transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  z-index: calc(var(--z-header) + 1); /* Above tab bar */
 }
 
 /* === TOOLBAR LAYOUT === */
-/* Horizontal layout with file actions on left, status on right */
+/* M3 spec: Horizontal layout with proper spacing */
 .toolbar-row {
   display: flex;                       /* Horizontal layout */
   justify-content: space-between;      /* Spread items apart */
   align-items: center;                 /* Vertical center alignment */
   max-width: 100%;                     /* Prevent overflow */
   height: 100%;                        /* Fill toolbar height */
+  padding: 0 var(--space-xs);          /* M3 spec: 4px horizontal padding */
 }
 
 /* === APP TITLE SECTION (Material 3) === */
-/* Main app title with M3 typography and expressive spacing */
+/* M3 spec: Title aligned left with proper spacing from icons */
 .app-title-section {
   flex: 1;                             /* Take available space */
   display: flex;                       /* Flexbox layout */
   align-items: center;                 /* Vertical center */
   justify-content: flex-start;         /* Left align */
-  padding-right: var(--space-xl);     /* Spacing before buttons */
+  padding: 0 var(--space-sm);          /* M3 spec: balanced spacing */
 }
 
 #app-title {
   font: var(--md-sys-typescale-title-large); /* M3 title-large typography (22px/28px/500) */
   color: var(--md-sys-color-on-surface); /* M3 surface text color */
   margin: 0;                           /* Remove default margins */
-  padding: var(--space-xs) var(--space-md); /* Comfortable padding for touch */
+  padding: var(--space-sm) var(--space-lg); /* M3 spec: comfortable padding for touch */
   cursor: pointer;                     /* Indicate it's clickable */
   border-radius: var(--md-sys-shape-corner-small); /* M3 small corner radius */
   transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
@@ -872,7 +919,13 @@ header {
   cursor: text;                        /* Text cursor */
 }
 
+/* === M3 TOP APP BAR - MOBILE VARIANT === */
+/* M3 spec: 56px height for mobile devices */
 @media screen and (max-width: 768px) {
+  :root {
+    --header-height: 56px;             /* M3 mobile: 56px */
+  }
+
   #app-title {
     font-size: 18px;                   /* Slightly smaller on mobile */
     max-width: 200px;                  /* Reduce max width on mobile */
@@ -880,10 +933,11 @@ header {
 }
 
 /* === FILE ACTION BUTTONS === */
-/* Container for New, Open, Save, Undo buttons */
+/* M3 spec: Trailing icon buttons with 4dp spacing */
 .file-actions {
   display: flex;                       /* Horizontal button row */
-  gap: var(--space-sm);                /* Compact spacing between buttons */
+  gap: var(--space-xs);                /* M3 spec: 4px spacing between icons */
+  padding-right: var(--space-xs);      /* M3 spec: 4px from edge */
 }
 
 /* === FILE STATUS DISPLAY === */
@@ -928,10 +982,12 @@ header {
 }
 
 /* === MATERIAL 3 ICON BUTTONS (Expressive Toolbar) === */
-/* Standard icon buttons with expressive motion and ripple support */
+/* Standard icon buttons with expressive motion and unbounded ripple support */
 .btn-mobile {
   position: relative;                    /* For state layer and ripple positioning */
-  background: transparent;               /* Transparent background */
+  background: transparent !important;    /* Transparent background - !important to override legacy styles */
+  background-color: transparent !important; /* Explicit background-color override */
+  background-image: none !important;     /* No gradients or images */
   border: none;                          /* No border */
   border-radius: 50%;                    /* Circular icon button */
   padding: 12px;                         /* M3 icon button padding (48px total) */
@@ -943,10 +999,11 @@ header {
   display: flex;                         /* Center icon content */
   align-items: center;                   /* Vertical centering */
   justify-content: center;               /* Horizontal centering */
-  overflow: hidden;                      /* Contain state layer and ripple */
-  transition: color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized),
-              transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-emphasized);
+  overflow: visible;                     /* Allow unbounded ripples to expand beyond bounds */
+  transition: color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized);
   -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
+  box-shadow: none !important;           /* No box shadow */
+  text-shadow: none !important;          /* No text shadow */
 }
 
 /* === M3 STATE LAYER === */
@@ -960,23 +1017,43 @@ header {
   border-radius: 50%;                    /* Match button shape */
   transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
   pointer-events: none;                  /* Don't interfere with clicks */
+  overflow: hidden;                      /* Contain state layer within button */
 }
 
-/* === EXPRESSIVE INTERACTION STATES === */
-/* Hover: Subtle elevation and color change */
-.btn-mobile:hover {
-  color: var(--md-sys-color-on-surface); /* Darker icon on hover */
-  transform: scale(1.05);                /* Subtle grow on hover */
+/* === M3 INTERACTION STATES === */
+/* M3 spec: State layers provide visual feedback */
+
+/* Hover: Only for mouse/pointer devices, not touch */
+@media (hover: hover) and (pointer: fine) {
+  .btn-mobile:hover {
+    color: var(--md-sys-color-on-surface);
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  .btn-mobile:hover::before {
+    opacity: var(--md-sys-state-hover-opacity); /* M3 hover state (8%) */
+  }
 }
 
-.btn-mobile:hover::before {
-  opacity: var(--md-sys-state-hover-opacity); /* M3 hover state (8%) */
+/* Touch devices: prevent hover state entirely */
+@media (hover: none) {
+  .btn-mobile:hover {
+    color: var(--md-sys-color-on-surface-variant);
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  .btn-mobile:hover::before {
+    opacity: 0;
+  }
 }
 
-/* Active/Pressed: Scale down with strong state layer */
+/* Active/Pressed: Works for both touch and mouse */
 .btn-mobile:active {
-  transform: scale(0.92);                /* Expressive press animation */
-  transition-duration: var(--md-sys-motion-duration-short1); /* Faster press response */
+  transition-duration: var(--md-sys-motion-duration-short1);
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .btn-mobile:active::before {
@@ -985,13 +1062,19 @@ header {
 
 /* Focus: Accessible keyboard navigation */
 .btn-mobile:focus-visible {
-  outline: 2px solid var(--md-sys-color-primary); /* M3 focus ring */
+  outline: 2px solid var(--md-sys-color-on-surface); /* M3 focus ring - subtle */
   outline-offset: 2px;                   /* Space around focus ring */
-  color: var(--md-sys-color-primary);    /* Accent color on focus */
 }
 
 .btn-mobile:focus:not(:focus-visible) {
   outline: none;                         /* Hide focus ring for mouse users */
+}
+
+/* Remove focus outline on tap/click */
+.btn-mobile:focus {
+  outline: none;                         /* No outline on tap */
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Disabled state */
@@ -999,6 +1082,8 @@ header {
   opacity: 0.38;                         /* M3 disabled opacity */
   cursor: not-allowed;                   /* Show disabled cursor */
   transform: none;                       /* No hover effects */
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .btn-mobile:disabled::before {
@@ -1023,10 +1108,22 @@ header {
   z-index: var(--z-modal);            /* Above all other content */
   padding: var(--space-xxl);          /* Breathing room around modal */
   box-sizing: border-box;              /* Include padding in size */
+  animation: fadeIn var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+  backdrop-filter: blur(2px);          /* Subtle blur effect for depth */
+  -webkit-backdrop-filter: blur(2px);  /* Safari support */
 }
 
 .modal-overlay.hidden {
   display: none;                       /* Hide when not active */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* === MODAL CONTAINER === */
@@ -1465,21 +1562,22 @@ body.modal-open {
 /* === TAB BAR SYSTEM === */
 /* Tabbed interface for managing multiple files */
 
-/* === TAB CONTAINER === */
-/* Horizontal bar below header containing tabs */
+/* === TAB CONTAINER (Material 3 Primary Tabs) === */
+/* M3 spec: https://m3.material.io/components/tabs/specs */
 .tab-bar {
   display: flex;
   align-items: center;
-  background-color: var(--md-sys-color-surface-container-low); /* Material 3 surface - slightly higher than toolbar */
-  border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 subtle separator */
-  padding: var(--space-sm) var(--space-md);
+  background-color: var(--md-sys-color-surface-container); /* M3 elevated surface container */
+  border-bottom: 1px solid var(--md-sys-color-outline-variant); /* M3 spec: divider under tabs */
+  padding: 0 var(--space-xs);         /* M3 spec: minimal horizontal padding */
   overflow-x: auto;
   overflow-y: hidden;
-  gap: var(--space-sm);
-  height: 44px;
+  gap: 0;                              /* M3 spec: no gap between tabs */
+  height: 48px;                        /* M3 spec: 48px height for primary tabs */
   flex-shrink: 0;
   position: relative;
   z-index: 50;
+  box-shadow: var(--md-sys-elevation-1); /* M3 elevation level 1 (lower than top bar) */
 }
 
 /* Hide scrollbar but allow scrolling */
@@ -1494,121 +1592,101 @@ body.modal-open {
 }
 
 /* === TABS CONTAINER === */
-/* Container for individual tabs */
+/* M3 spec: Container for individual tabs */
 .tabs-container {
   display: flex;
-  gap: var(--space-sm);
+  gap: 0;                              /* M3 spec: no gap */
   flex: 1;
   align-items: center;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-/* === INDIVIDUAL TAB (Material 3 Expressive) === */
-/* Single tab representing one open file with variable font expressiveness */
+/* === INDIVIDUAL TAB (Material 3 Primary Tabs) === */
+/* M3 spec: Single tab with proper typography and spacing */
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;                            /* M3 spec: compact spacing */
   background: transparent;
   border: none;
-  border-radius: 0;
-  padding: 0 20px;                     /* More generous padding */
+  border-radius: var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0; /* Minimal rounded top */
+  padding: 0 20px;                     /* M3 spec: comfortable padding */
   cursor: pointer;
-  color: var(--md-sys-color-on-surface-variant);
+  color: var(--md-sys-color-on-surface-variant); /* M3 inactive color */
   font-family: var(--font-family-ui);
-  font-size: 14px;
-  font-weight: 450;                    /* Variable font: lighter inactive weight */
-  font-variation-settings: 'wght' 450; /* Explicit variable font weight */
-  letter-spacing: 0.01em;              /* Subtle tracking for legibility */
-  line-height: 20px;
-  transition: color var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
-              font-weight var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
-              font-variation-settings var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
-              letter-spacing var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
-              transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  font-size: 14px;                     /* M3 title-small */
+  font-weight: 500;                    /* M3 title-small weight */
+  line-height: 20px;                   /* M3 title-small line height */
+  letter-spacing: 0.1px;               /* M3 title-small tracking */
+  transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+              box-shadow var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
   white-space: nowrap;
-  min-width: 90px;                     /* Slightly wider for better presence */
-  max-width: 200px;                    /* More room for file names */
-  height: 48px;
+  min-width: 90px;
+  max-width: 220px;
+  height: 48px;                        /* M3 spec: 48px tab height */
   position: relative;
+  margin: 0 2px;                       /* Slight spacing between tabs */
 }
 
-/* Hover state with weight change */
-.tab:hover {
-  font-weight: 500;                    /* Slightly heavier on hover */
-  font-variation-settings: 'wght' 500;
-  letter-spacing: 0.015em;             /* Slightly more tracking */
-  transform: translateY(-1px);         /* Subtle lift for expressiveness */
-}
-
-/* State layer for hover */
+/* State layer for interaction feedback */
 .tab::before {
   content: '';
   position: absolute;
   inset: 0;
   background-color: var(--md-sys-color-on-surface);
   opacity: 0;
+  border-radius: var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0;
   transition: opacity var(--md-sys-motion-duration-short1) var(--md-sys-motion-easing-standard);
+  pointer-events: none;
 }
 
-.tab:hover::before {
-  opacity: var(--md-sys-state-hover-opacity);
+/* Hover: Only for mouse/pointer devices, not touch */
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover {
+    color: var(--md-sys-color-on-surface);
+    background-color: color-mix(in srgb, var(--md-sys-color-primary), transparent 95%); /* Subtle tint */
+  }
+
+  .tab:hover::before {
+    opacity: var(--md-sys-state-hover-opacity);
+  }
 }
 
+/* Active/Pressed: Works for both touch and mouse */
 .tab:active::before {
   opacity: var(--md-sys-state-pressed-opacity);
 }
 
-/* === ACTIVE TAB (Material 3 Expressive) === */
-/* Highlighted tab showing currently open file with bold expressiveness */
+/* === ACTIVE TAB (Material 3 Primary Tabs) === */
+/* M3 spec: Active tab with proper color and indicator */
 .tab.active {
-  color: var(--md-sys-color-primary);
-  font-weight: 650;                    /* Variable font: bold active weight */
-  font-variation-settings: 'wght' 650;
-  letter-spacing: 0.02em;              /* More tracking for emphasis */
-  transform: scale(1.02);              /* Subtle scale up for prominence */
+  color: var(--md-sys-color-primary);  /* M3 active color */
+  font-weight: 500;                    /* M3 spec: same weight as inactive */
+  background-color: color-mix(in srgb, var(--md-sys-color-primary), transparent 88%); /* M3 tonal container with hint of color */
+  box-shadow: var(--md-sys-elevation-1), inset 0 -3px 0 0 var(--md-sys-color-primary); /* Elevate tab + inset bottom border */
+  z-index: 2;                          /* Above other tabs */
 }
 
-/* Keep hover state for active tabs even more prominent */
-.tab.active:hover {
-  font-weight: 700;                    /* Variable font: even bolder on hover */
-  font-variation-settings: 'wght' 700;
-  transform: scale(1.02) translateY(-1px);
+/* Hover state for active tabs - mouse only */
+@media (hover: hover) and (pointer: fine) {
+  .tab.active:hover {
+    color: var(--md-sys-color-primary);  /* Keep primary color */
+    background-color: color-mix(in srgb, var(--md-sys-color-primary), transparent 85%); /* Darker tint on hover */
+    box-shadow: var(--md-sys-elevation-2), inset 0 -3px 0 0 var(--md-sys-color-primary); /* Increase elevation on hover + keep inset border */
+  }
 }
 
-/* Material 3 tab indicator - more prominent */
-.tab::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: var(--md-sys-color-primary);
-  transform: scaleX(0);
-  transform-origin: left;              /* Grow from left for directionality */
-  transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
-              height var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
-  border-radius: 3px 3px 0 0;         /* Rounded top corners */
-}
-
-.tab.active::after {
-  transform: scaleX(1);
-  height: 4px;                         /* Slightly thicker when active */
-}
-
-/* Indicator grows on hover for active tab */
-.tab.active:hover::after {
-  height: 5px;                         /* Even thicker on hover */
-}
+/* M3 Tab Indicator (Active Indicator) */
+/* Using border-bottom on active tab instead of ::after pseudo-element */
+/* This creates a cleaner, more elevated look */
 
 /* === DIRTY TAB INDICATOR === */
-/* Visual indicator for unsaved changes */
+/* M3 visual indicator for unsaved changes */
 .tab.dirty .tab-name::after {
   content: '●';
   margin-left: var(--space-xs);
-  color: var(--accent);
+  color: var(--md-sys-color-primary);
   font-size: 10px;
 }
 
@@ -1625,11 +1703,11 @@ body.modal-open {
 /* === TAB NAME INPUT === */
 /* Inline editing input for tab names */
 .tab-name-input {
-  background: var(--background);
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-sm);
+  background: var(--md-sys-color-surface-container-highest);
+  border: 1px solid var(--md-sys-color-primary);
+  border-radius: var(--md-sys-shape-corner-extra-small);
   padding: 2px var(--space-xs);
-  color: var(--text-primary);
+  color: var(--md-sys-color-on-surface);
   font-family: var(--font-family);
   font-size: var(--font-size-small);
   outline: none;
@@ -1638,42 +1716,49 @@ body.modal-open {
 }
 
 /* === TAB CLOSE BUTTON === */
-/* Close button for each tab */
+/* M3 icon button for closing tabs */
 .tab-close {
   background: none;
   border: none;
-  color: var(--text-primary);
-  font-size: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 16px;
   cursor: pointer;
-  padding: 0;
+  padding: 2px;
   width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: var(--transition-fast);
-  opacity: 0.6;
+  transition: all var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+  opacity: 0;                          /* Hidden by default */
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
-.tab-close:hover {
-  background: var(--accent);
-  opacity: 1;
-  color: white;
-}
-
+/* Show close button on hover or when active */
+.tab:hover .tab-close,
 .tab.active .tab-close {
-  opacity: 1;
+  opacity: 0.7;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tab-close:hover {
+    background: var(--md-sys-color-error-container);
+    opacity: 1 !important;
+    color: var(--md-sys-color-on-error-container);
+    transform: scale(1.15);
+  }
 }
 
 /* === ADD TAB BUTTON === */
-/* Button to create new tab */
+/* M3 filled icon button to create new tab */
 .tab-add-btn {
-  background: var(--surface);
-  border: 1px solid var(--outline);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  color: var(--md-sys-color-on-surface);
   font-size: 20px;
   cursor: pointer;
   padding: 0;
@@ -1682,31 +1767,29 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-fast);
+  transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   flex-shrink: 0;
   font-weight: bold;
 }
 
 .tab-add-btn:hover {
-  background: var(--primary);
-  color: black;
-  transform: scale(1.1);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
 /* === MOBILE TAB OPTIMIZATIONS === */
-/* Maintain expressiveness on smaller screens */
+/* M3 spec adjustments for mobile */
 @media screen and (max-width: 768px) {
   .tab {
     min-width: 75px;                   /* Slightly wider for touch */
     max-width: 150px;                  /* More room on mobile */
-    padding: 0 16px;                   /* Adjusted padding */
+    padding: 0 12px;                   /* M3 spec: reduced padding on mobile */
     font-size: 13px;                   /* Slightly smaller but still legible */
-    font-weight: 425;                  /* Lighter weight on mobile */
-    font-variation-settings: 'wght' 425;
+    font-weight: 500;                  /* M3 spec: consistent weight */
   }
 
   .tab.active {
-    font-weight: 625;                  /* Bold but not too heavy on mobile */
+    font-weight: 500;                  /* M3 spec: same weight as inactive */
     font-variation-settings: 'wght' 625;
   }
 
@@ -1859,7 +1942,38 @@ body .main-content {
   color: var(--md-sys-color-on-surface-variant);
 }
 
-/* === RIPPLE EFFECT === */
+/* === MATERIAL 3 EXPRESSIVE RIPPLE EFFECT === */
+/* Implements M3 expressive design guidelines with unbounded ripples */
+
+.m3-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: currentColor;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Animation applied via JS for better control */
+}
+
+/* Unbounded ripples extend beyond element bounds (for icon buttons) */
+.m3-ripple-unbounded {
+  /* No overflow constraint - ripple expands freely */
+}
+
+/* M3 Expressive ripple animation */
+@keyframes m3-ripple-expressive {
+  0% {
+    transform: scale(0);
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Legacy ripple support (for backward compatibility) */
 .ripple {
   position: absolute;
   border-radius: 50%;
@@ -2002,21 +2116,19 @@ body .main-content {
 }
 
 /* === ICON INTERACTION STATES === */
-/* Enhanced hover/active/disabled states for Material Icons */
+/* M3 spec: Icons inherit button color, no separate color changes */
 
-/* Icon hover state */
+/* Icon hover state - inherit from button */
 .btn-mobile:hover .material-icons,
 .action-btn:hover .material-icons {
-  color: var(--md-sys-color-primary);
-  transform: scale(1.05);
-  transition: transform var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-emphasized),
-              color var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
+  /* Color inherited from button :hover state */
+  /* No transform - button already has transform */
 }
 
-/* Icon active state */
+/* Icon active state - inherit from button */
 .btn-mobile:active .material-icons,
 .action-btn:active .material-icons {
-  transform: scale(0.95);
+  /* Color and transform inherited from button :active state */
 }
 
 /* Icon disabled state */

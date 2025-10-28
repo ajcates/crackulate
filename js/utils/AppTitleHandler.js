@@ -1,5 +1,7 @@
+import { eventBus } from '../core/EventBus.js';
+
 /**
- * App Title Handler - Makes app title editable and persists changes
+ * App Title Handler - Makes app title editable and syncs with active tab
  * High cohesion: Only responsible for app title interaction
  */
 export class AppTitleHandler {
@@ -7,9 +9,13 @@ export class AppTitleHandler {
   #storageKey = 'crackulator_app_title';
   #defaultTitle = 'Crackulator';
   #isEditing = false;
+  #appState = null;
+  #unsubscribers = [];
 
-  constructor() {
+  constructor(appState) {
+    this.#appState = appState;
     this.#initializeTitle();
+    this.#subscribeToTabChanges();
   }
 
   /**
@@ -82,7 +88,7 @@ export class AppTitleHandler {
   /**
    * Finish editing and save the title
    */
-  #finishEditing() {
+  async #finishEditing() {
     this.#isEditing = false;
     this.#titleElement.contentEditable = 'false';
 
@@ -97,6 +103,17 @@ export class AppTitleHandler {
 
     // Save to localStorage
     this.#saveTitle(newTitle);
+
+    // Update the active tab's name if we have appState
+    if (this.#appState) {
+      const activeTabId = this.#appState.getState('activeTabId');
+      const tabs = this.#appState.getState('tabs');
+
+      if (activeTabId && tabs && tabs.length > 0) {
+        // Emit event to update the active tab's name
+        await eventBus.emit('title:changed', { tabName: newTitle });
+      }
+    }
 
     // Remove selection
     window.getSelection().removeAllRanges();
@@ -162,5 +179,53 @@ export class AppTitleHandler {
    */
   resetTitle() {
     this.setTitle(this.#defaultTitle);
+  }
+
+  /**
+   * Subscribe to tab change events to sync title
+   */
+  #subscribeToTabChanges() {
+    if (!this.#appState) return;
+
+    // Subscribe to tab activation events
+    this.#unsubscribers.push(
+      eventBus.subscribe('tab:activated', ({ tab }) => {
+        if (tab && !this.#isEditing) {
+          this.#updateTitleFromTab(tab.name);
+        }
+      })
+    );
+
+    // Subscribe to state changes to update title
+    this.#unsubscribers.push(
+      eventBus.subscribe('state:changed', ({ updates, newState }) => {
+        if ('activeTabId' in updates && !this.#isEditing) {
+          const tabs = newState.tabs || [];
+          const activeTabId = newState.activeTabId;
+          const activeTab = tabs.find(tab => tab.id === activeTabId);
+          if (activeTab) {
+            this.#updateTitleFromTab(activeTab.name);
+          }
+        }
+      })
+    );
+  }
+
+  /**
+   * Update title from tab name without saving to localStorage
+   * @param {string} tabName - Tab name to display
+   */
+  #updateTitleFromTab(tabName) {
+    if (this.#titleElement && tabName && !this.#isEditing) {
+      this.#titleElement.textContent = tabName;
+    }
+  }
+
+  /**
+   * Clean up event subscriptions
+   */
+  destroy() {
+    this.#unsubscribers.forEach(unsubscribe => unsubscribe());
+    this.#unsubscribers = [];
   }
 }

@@ -8,6 +8,8 @@ export class TabController {
   #state;
   #tabService;
   #unsubscribers = [];
+  #TABS_STORAGE_KEY = 'crackulator_tabs';
+  #ACTIVE_TAB_STORAGE_KEY = 'crackulator_active_tab_id';
 
   constructor(view, state, tabService) {
     this.#view = view;
@@ -37,7 +39,8 @@ export class TabController {
     this.#unsubscribers.push(
       eventBus.subscribe('tab:create', this.#handleNewTab.bind(this)),
       eventBus.subscribe('tab:close', ({ tabId }) => this.#handleTabClose(tabId)),
-      eventBus.subscribe('tab:switch', ({ tabId }) => this.#handleTabSelect(tabId))
+      eventBus.subscribe('tab:switch', ({ tabId }) => this.#handleTabSelect(tabId)),
+      eventBus.subscribe('title:changed', ({ tabName }) => this.#handleTitleChange(tabName))
     );
 
     // Initialize view with current state
@@ -48,16 +51,31 @@ export class TabController {
    * Initialize view with current state
    */
   async #initializeView() {
-    const tabs = this.#state.getState('tabs');
-    const activeTabId = this.#state.getState('activeTabId');
+    let tabs = this.#state.getState('tabs');
+    let activeTabId = this.#state.getState('activeTabId');
 
-    // If no tabs exist, create a default tab
+    // Try to load tabs from localStorage first
     if (tabs.length === 0) {
-      const defaultTab = this.#tabService.getDefaultTab();
-      await this.#state.setState({
-        tabs: [defaultTab],
-        activeTabId: defaultTab.id
-      });
+      const loadedData = this.#loadTabsFromStorage();
+      if (loadedData) {
+        tabs = loadedData.tabs;
+        activeTabId = loadedData.activeTabId;
+
+        // Update state with loaded tabs
+        await this.#state.setState({
+          tabs: tabs,
+          activeTabId: activeTabId,
+          'editor.content': loadedData.activeTab?.content || '',
+          currentFile: loadedData.activeTab?.name || 'Untitled'
+        });
+      } else {
+        // No saved tabs, create default tab
+        const defaultTab = this.#tabService.getDefaultTab();
+        await this.#state.setState({
+          tabs: [defaultTab],
+          activeTabId: defaultTab.id
+        });
+      }
     } else {
       // Render existing tabs
       this.#view.renderTabs(tabs, activeTabId);
@@ -108,11 +126,7 @@ export class TabController {
 
     if (!tab) return;
 
-    // Check if tab has unsaved changes
-    if (tab.isDirty) {
-      const confirmed = confirm(`Tab "${tab.name}" has unsaved changes. Close anyway?`);
-      if (!confirmed) return;
-    }
+    // No confirmation needed - auto-save means everything is saved
 
     // If only one tab, create a new one before closing
     if (tabs.length === 1) {
@@ -162,7 +176,7 @@ export class TabController {
     const tabs = this.#state.getState('tabs');
     const updatedTabs = this.#tabService.updateTab(tabs, tabId, {
       name: newName,
-      isDirty: true
+      isDirty: false // Auto-save: never dirty
     });
 
     await this.#state.setState({
@@ -179,6 +193,32 @@ export class TabController {
 
     // Emit event
     await eventBus.emit('tab:renamed', { tabId, newName });
+  }
+
+  /**
+   * Handle title change from app bar
+   */
+  async #handleTitleChange(newName) {
+    const activeTabId = this.#state.getState('activeTabId');
+    if (!activeTabId) return;
+
+    if (!this.#tabService.isValidTabName(newName)) {
+      return;
+    }
+
+    const tabs = this.#state.getState('tabs');
+    const updatedTabs = this.#tabService.updateTab(tabs, activeTabId, {
+      name: newName,
+      isDirty: false // Auto-save: never dirty
+    });
+
+    await this.#state.setState({
+      tabs: updatedTabs,
+      currentFile: newName
+    });
+
+    // Emit event
+    await eventBus.emit('tab:renamed', { tabId: activeTabId, newName });
   }
 
   /**
@@ -231,18 +271,24 @@ export class TabController {
       const tabs = newState.tabs;
       const activeTabId = newState.activeTabId;
       this.#view.renderTabs(tabs, activeTabId);
+
+      // Persist tabs to localStorage
+      this.#saveTabsToStorage(tabs, activeTabId);
     }
 
-    // Mark active tab as dirty when content changes
+    // Auto-save tab content when editor content changes
     if ('editor.content' in updates) {
       const activeTabId = this.#state.getState('activeTabId');
       if (activeTabId) {
         const tabs = this.#state.getState('tabs');
         const activeTab = this.#tabService.findTab(tabs, activeTabId);
 
-        // Only mark dirty if content actually changed
+        // Auto-save: update tab content (never mark as dirty)
         if (activeTab && activeTab.content !== updates['editor.content']) {
-          const updatedTabs = this.#tabService.markDirty(tabs, activeTabId);
+          const updatedTabs = this.#tabService.updateTab(tabs, activeTabId, {
+            content: updates['editor.content'],
+            isDirty: false // Always saved, never dirty
+          });
           await this.#state.setState({
             tabs: updatedTabs
           });
@@ -271,28 +317,65 @@ export class TabController {
 
   /**
    * Save active tab content
+   * Note: With auto-save, this is essentially a no-op but kept for compatibility
    */
   async saveActiveTab() {
-    const activeTabId = this.#state.getState('activeTabId');
-    if (!activeTabId) return;
+    // Auto-save handles this automatically
+    // Content is already saved when it changes
+  }
 
-    const tabs = this.#state.getState('tabs');
-    const content = this.#state.getState('editor.content');
+  /**
+   * Save tabs to localStorage
+   */
+  #saveTabsToStorage(tabs, activeTabId) {
+    try {
+      const dataToSave = {
+        tabs: tabs,
+        activeTabId: activeTabId,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(this.#TABS_STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error('Failed to save tabs to localStorage:', error);
+    }
+  }
 
-    const updatedTabs = this.#tabService.updateTab(tabs, activeTabId, {
-      content,
-      isDirty: false
-    });
+  /**
+   * Load tabs from localStorage
+   */
+  #loadTabsFromStorage() {
+    try {
+      const savedData = localStorage.getItem(this.#TABS_STORAGE_KEY);
+      if (!savedData) return null;
 
-    await this.#state.setState({
-      tabs: updatedTabs
-    });
+      const parsed = JSON.parse(savedData);
+      if (!parsed.tabs || !Array.isArray(parsed.tabs) || parsed.tabs.length === 0) {
+        return null;
+      }
+
+      // Find the active tab
+      const activeTab = parsed.tabs.find(tab => tab.id === parsed.activeTabId);
+
+      return {
+        tabs: parsed.tabs,
+        activeTabId: parsed.activeTabId,
+        activeTab: activeTab
+      };
+    } catch (error) {
+      console.error('Failed to load tabs from localStorage:', error);
+      return null;
+    }
   }
 
   /**
    * Clean up resources
    */
   destroy() {
+    // Save tabs before cleanup
+    const tabs = this.#state.getState('tabs');
+    const activeTabId = this.#state.getState('activeTabId');
+    this.#saveTabsToStorage(tabs, activeTabId);
+
     // Unsubscribe from all events
     this.#unsubscribers.forEach(unsubscribe => unsubscribe());
     this.#unsubscribers = [];
