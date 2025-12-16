@@ -1,9 +1,13 @@
+import { RippleEffect } from '../utils/RippleEffect.js';
+
 /**
  * TabView - Manages tab bar UI with editable tab names
  */
 export class TabView {
   #container;
   #eventHandlers = new Map();
+  #indicator = null;
+  #animatingTabs = new Set(); // Track tabs being animated
 
   constructor(container) {
     if (!container) {
@@ -11,6 +15,7 @@ export class TabView {
     }
     this.#container = container;
     this.#setupContainer();
+    this.#createIndicator();
   }
 
   /**
@@ -22,6 +27,15 @@ export class TabView {
       <div class="tabs-container"></div>
       <button class="tab-add-btn" title="New tab">+</button>
     `;
+  }
+
+  /**
+   * Create sliding indicator element
+   */
+  #createIndicator() {
+    this.#indicator = document.createElement('div');
+    this.#indicator.className = 'tab-indicator';
+    this.#getTabsContainer().appendChild(this.#indicator);
   }
 
   /**
@@ -193,12 +207,62 @@ export class TabView {
    */
   renderTabs(tabs, activeTabId) {
     const tabsContainer = this.#getTabsContainer();
-    tabsContainer.innerHTML = '';
+    const previousTabs = new Set(
+      Array.from(tabsContainer.querySelectorAll('.tab:not(.tab-exiting)')).map(el => el.dataset.tabId)
+    );
 
-    tabs.forEach(tab => {
-      const tabElement = this.#createTabElement(tab, tab.id === activeTabId);
-      tabsContainer.appendChild(tabElement);
+    // Get current tabs including animating ones
+    const currentElements = Array.from(tabsContainer.querySelectorAll('.tab'));
+    const currentTabIds = new Set(currentElements.map(el => el.dataset.tabId));
+    const newTabIds = new Set(tabs.map(tab => tab.id));
+
+    // Remove tabs that are no longer in state (but skip animating tabs)
+    currentElements.forEach(el => {
+      const tabId = el.dataset.tabId;
+      if (!newTabIds.has(tabId) && !this.#animatingTabs.has(tabId)) {
+        el.remove();
+      }
     });
+
+    // Add or update tabs
+    tabs.forEach((tab, index) => {
+      const existingElement = tabsContainer.querySelector(`[data-tab-id="${tab.id}"]:not(.tab-exiting)`);
+
+      if (existingElement) {
+        // Update existing tab
+        existingElement.className = `tab ${tab.id === activeTabId ? 'active' : ''}${tab.isDirty ? ' dirty' : ''}`;
+        const nameElement = existingElement.querySelector('.tab-name');
+        if (nameElement) nameElement.textContent = tab.name;
+      } else if (!this.#animatingTabs.has(tab.id)) {
+        // Create new tab
+        const tabElement = this.#createTabElement(tab, tab.id === activeTabId);
+
+        // Insert at correct position
+        const nextTab = tabs[index + 1];
+        if (nextTab) {
+          const nextElement = tabsContainer.querySelector(`[data-tab-id="${nextTab.id}"]`);
+          if (nextElement) {
+            tabsContainer.insertBefore(tabElement, nextElement);
+          } else {
+            tabsContainer.insertBefore(tabElement, this.#indicator);
+          }
+        } else {
+          tabsContainer.insertBefore(tabElement, this.#indicator);
+        }
+
+        // Animate new tabs (not previously rendered)
+        if (!previousTabs.has(tab.id)) {
+          this.#animateTabCreation(tabElement);
+        }
+      }
+    });
+
+    // Update indicator position for active tab
+    if (activeTabId) {
+      requestAnimationFrame(() => {
+        this.#updateIndicator(activeTabId);
+      });
+    }
   }
 
   /**
@@ -224,6 +288,9 @@ export class TabView {
 
     tabEl.appendChild(nameEl);
     tabEl.appendChild(closeBtn);
+
+    // Add Material 3 ripple effect (bounded, not unbounded)
+    RippleEffect.init(tabEl, { unbounded: false });
 
     return tabEl;
   }
@@ -261,7 +328,103 @@ export class TabView {
     const activeTab = this.#container.querySelector(`[data-tab-id="${tabId}"]`);
     if (activeTab) {
       activeTab.classList.add('active');
+      // Update indicator position with animation
+      this.#updateIndicator(tabId);
     }
+  }
+
+  /**
+   * Get tab position and dimensions
+   * @param {string} tabId - Tab ID
+   * @returns {Object} Position object with left and width
+   */
+  #getTabPosition(tabId) {
+    const tabElement = this.#container.querySelector(`[data-tab-id="${tabId}"]`);
+    if (!tabElement) return { left: 0, width: 0 };
+
+    const tabsContainer = this.#getTabsContainer();
+    const containerRect = tabsContainer.getBoundingClientRect();
+    const tabRect = tabElement.getBoundingClientRect();
+
+    return {
+      left: tabRect.left - containerRect.left + tabsContainer.scrollLeft,
+      width: tabRect.width
+    };
+  }
+
+  /**
+   * Update indicator position with animation
+   * @param {string} tabId - Tab ID to position indicator under
+   */
+  #updateIndicator(tabId) {
+    if (!this.#indicator) return;
+
+    const position = this.#getTabPosition(tabId);
+
+    // Use requestAnimationFrame for smooth animation
+    requestAnimationFrame(() => {
+      this.#indicator.style.transform = `translateX(${position.left}px)`;
+      this.#indicator.style.width = `${position.width}px`;
+    });
+  }
+
+  /**
+   * Animate tab creation entrance
+   * @param {HTMLElement} tabElement - Tab element to animate
+   * @returns {Promise} Resolves when animation completes
+   */
+  #animateTabCreation(tabElement) {
+    return new Promise((resolve) => {
+      // Add entering class to trigger animation
+      tabElement.classList.add('tab-entering');
+
+      // Remove class after animation completes
+      const cleanup = () => {
+        tabElement.classList.remove('tab-entering');
+        tabElement.removeEventListener('animationend', cleanup);
+        resolve();
+      };
+
+      tabElement.addEventListener('animationend', cleanup);
+    });
+  }
+
+  /**
+   * Animate tab removal exit
+   * @param {string} tabId - Tab ID to remove
+   * @returns {Promise} Resolves when animation completes
+   */
+  #animateTabRemoval(tabId) {
+    return new Promise((resolve) => {
+      const tabElement = this.#container.querySelector(`[data-tab-id="${tabId}"]`);
+      if (!tabElement) {
+        resolve();
+        return;
+      }
+
+      // Add exiting class to trigger animation
+      tabElement.classList.add('tab-exiting');
+
+      // Remove element after animation completes
+      const cleanup = () => {
+        tabElement.remove();
+        tabElement.removeEventListener('animationend', cleanup);
+        this.#animatingTabs.delete(tabId);
+        resolve();
+      };
+
+      this.#animatingTabs.add(tabId);
+      tabElement.addEventListener('animationend', cleanup);
+    });
+  }
+
+  /**
+   * Animate and remove a tab
+   * @param {string} tabId - Tab ID to remove
+   * @returns {Promise} Resolves when animation completes
+   */
+  async animateRemoveTab(tabId) {
+    return this.#animateTabRemoval(tabId);
   }
 
   /**

@@ -130,6 +130,9 @@ export class Application {
 
     // Material 3 ripple effects for toolbar buttons
     RippleEffect.init('.btn-mobile');
+
+    // Material 3 ripple effects for tabs (bounded, not unbounded)
+    RippleEffect.init('.tab', { unbounded: false });
   }
 
   /**

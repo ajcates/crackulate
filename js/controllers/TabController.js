@@ -93,6 +93,9 @@ export class TabController {
 
     const currentActiveTabId = this.#state.getState('activeTabId');
 
+    // Don't animate if selecting the already active tab
+    if (currentActiveTabId === tabId) return;
+
     // Save current tab's content before switching
     if (currentActiveTabId) {
       const currentContent = this.#state.getState('editor.content');
@@ -105,15 +108,59 @@ export class TabController {
       });
     }
 
-    // Switch to new tab
-    await this.#state.setState({
-      activeTabId: tabId,
-      'editor.content': tab.content,
-      currentFile: tab.name
+    // Animate content switch
+    await this.#animateContentSwitch(async () => {
+      // Switch to new tab during animation
+      await this.#state.setState({
+        activeTabId: tabId,
+        'editor.content': tab.content,
+        currentFile: tab.name
+      });
     });
 
     // Emit event for other components
     await eventBus.emit('tab:activated', { tabId, tab });
+  }
+
+  /**
+   * Animate content crossfade when switching tabs
+   * @param {Function} switchCallback - Callback to execute during transition
+   * @returns {Promise} Resolves when animation completes
+   */
+  async #animateContentSwitch(switchCallback) {
+    const editorElement = document.querySelector('.editor');
+    const resultsElement = document.querySelector('.results');
+
+    if (!editorElement || !resultsElement) {
+      // No elements to animate, just execute callback
+      await switchCallback();
+      return;
+    }
+
+    // Fade out current content
+    editorElement.classList.add('content-fade-out');
+    resultsElement.classList.add('content-fade-out');
+
+    // Wait for fade out (200ms)
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    // Execute switch callback (update state with new content)
+    await switchCallback();
+
+    // Remove fade-out classes
+    editorElement.classList.remove('content-fade-out');
+    resultsElement.classList.remove('content-fade-out');
+
+    // Fade in new content
+    editorElement.classList.add('content-fade-in');
+    resultsElement.classList.add('content-fade-in');
+
+    // Wait for fade in (300ms)
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Clean up
+    editorElement.classList.remove('content-fade-in');
+    resultsElement.classList.remove('content-fade-in');
   }
 
   /**
@@ -143,17 +190,24 @@ export class TabController {
     // Determine next active tab
     const nextActiveTabId = this.#tabService.getNextActiveTabId(tabs, tabId, activeTabId);
 
-    // Remove tab
+    // Trigger exit animation first (before removing from state)
+    await this.#view.animateRemoveTab(tabId);
+
+    // Remove tab from state
     const updatedTabs = this.#tabService.removeTab(tabs, tabId);
 
     // Switch to next tab if we're closing the active one
     if (tabId === activeTabId && nextActiveTabId) {
       const nextTab = this.#tabService.findTab(updatedTabs, nextActiveTabId);
-      await this.#state.setState({
-        tabs: updatedTabs,
-        activeTabId: nextActiveTabId,
-        'editor.content': nextTab?.content || '',
-        currentFile: nextTab?.name || 'Untitled'
+
+      // Use content animation if switching tabs
+      await this.#animateContentSwitch(async () => {
+        await this.#state.setState({
+          tabs: updatedTabs,
+          activeTabId: nextActiveTabId,
+          'editor.content': nextTab?.content || '',
+          currentFile: nextTab?.name || 'Untitled'
+        });
       });
     } else {
       await this.#state.setState({

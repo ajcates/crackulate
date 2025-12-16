@@ -1810,6 +1810,142 @@ body.modal-open {
   }
 }
 
+/* ========================================
+   MATERIAL 3 TAB ANIMATIONS
+   Expressive animations for tab switching and creation
+   ======================================== */
+
+/* === SLIDING INDICATOR === */
+/* Animated bottom border that slides between tabs */
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: var(--md-sys-color-primary);
+  border-radius: 3px 3px 0 0;
+  transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate),
+              width var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
+  will-change: transform, width;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* === TAB ENTRANCE ANIMATION === */
+/* Scale and fade in new tabs */
+@keyframes tab-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.tab-entering {
+  animation: tab-enter 350ms var(--md-sys-motion-easing-emphasized-decelerate) forwards;
+}
+
+/* === TAB EXIT ANIMATION === */
+/* Scale down and fade out closing tabs */
+@keyframes tab-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.tab-exiting {
+  animation: tab-exit 200ms var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+  pointer-events: none;
+}
+
+/* === CONTENT CROSSFADE ANIMATIONS === */
+/* Smooth transitions between tab contents */
+.content-fade-out {
+  animation: fade-out 200ms var(--md-sys-motion-easing-emphasized) forwards;
+}
+
+.content-fade-in {
+  animation: fade-in-slide 300ms var(--md-sys-motion-easing-emphasized-decelerate) 100ms forwards;
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in-slide {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* === ENHANCED INTERACTION STATES === */
+/* Add elevation and scale on hover/active */
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--md-sys-elevation-2);
+    will-change: transform, box-shadow;
+  }
+
+  .tab.active:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: var(--md-sys-elevation-3), inset 0 -3px 0 0 var(--md-sys-color-primary);
+  }
+}
+
+.tab.active {
+  transform: scale(1.02);
+  will-change: transform;
+}
+
+/* === REDUCED MOTION ACCESSIBILITY === */
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .tab-indicator,
+  .tab,
+  .tab:hover,
+  .tab.active,
+  .tab.active:hover {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    transform: none !important;
+  }
+
+  .tab-entering,
+  .tab-exiting {
+    animation-duration: 1ms !important;
+  }
+
+  .content-fade-out,
+  .content-fade-in {
+    animation-duration: 1ms !important;
+  }
+
+  /* Disable transforms for accessibility */
+  .tab:hover,
+  .tab.active {
+    transform: none !important;
+  }
+}
+
 /* === LAYOUT ADJUSTMENTS FOR TAB BAR === */
 /* Adjust main content to account for tab bar */
 body .main-content {
